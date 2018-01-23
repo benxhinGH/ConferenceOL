@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
     <include
-        layout="@layout/conference_manage_main"
+        layout="@layout/conf_manage_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
     <android.support.design.widget.NavigationView
@@ -18,7 +18,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/conference_manage_nav_header"
+        app:headerLayout="@layout/conf_manage_nav_header"
         app:menu="@menu/conference_manage_nav_menu" />
 
 </android.support.v4.widget.DrawerLayout>

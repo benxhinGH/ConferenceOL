@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity{
                 String msg=userHttpResult.getMsg();
                 if(code==0){
                     Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                    Intent intent=new Intent(LoginActivity.this,ConferenceManageActivity.class);
+                    Intent intent=new Intent(LoginActivity.this,ConfManageActivity.class);
                     startActivity(intent);
                     finish();
                 }else{

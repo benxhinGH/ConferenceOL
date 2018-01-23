@@ -3,12 +3,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
-        android:id="@+id/tv_conf_name"
+        android:id="@+id/tv_conf_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="会议名称"/>
     <TextView
-        android:id="@+id/tv_room_number"
+        android:id="@+id/tv_room_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="房间号"/>

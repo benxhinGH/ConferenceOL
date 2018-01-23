@@ -4,29 +4,38 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.usiellau.conferenceol.R;
+import com.usiellau.conferenceol.adapter.ConfRvAdapter;
+import com.usiellau.conferenceol.network.ConfSvMethods;
+import com.usiellau.conferenceol.network.HttpResult;
+import com.usiellau.conferenceol.network.entity.ConfIng;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.ButterKnife;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by UsielLau on 2018/1/22 0022 2:49.
  */
 
-public class ConferenceManageActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class ConfManageActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     Toolbar toolbar;
     DrawerLayout drawer;
@@ -34,13 +43,16 @@ public class ConferenceManageActivity extends AppCompatActivity implements Navig
     RecyclerView rvConfList;
     SwipeRefreshLayout refreshLayout;
 
+    ConfRvAdapter confListAdapter;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_conference_manage);
+        setContentView(R.layout.activity_conf_manage);
         ButterKnife.bind(this);
         initViews();
+        refreshConfList();
     }
 
     private void initViews(){
@@ -60,10 +72,55 @@ public class ConferenceManageActivity extends AppCompatActivity implements Navig
 
         rvConfList=findViewById(R.id.rv_conf_list);
         rvConfList.setLayoutManager(new LinearLayoutManager(this));
+        rvConfList.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
+        confListAdapter=new ConfRvAdapter(this,new ArrayList<ConfIng>());
+        rvConfList.setAdapter(confListAdapter);
 
 
         refreshLayout=findViewById(R.id.refresh_layout);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.d("ConfManageActivity","onRefresh.......");
+                refreshConfList();
+            }
+        });
 
+    }
+
+
+    private void refreshConfList(){
+        Log.d("ConfManageActivity","refreshConfList............");
+        ConfSvMethods.getInstance().queryAllConfIng(new Observer<HttpResult<List<ConfIng>>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                refreshLayout.setRefreshing(true);
+            }
+
+            @Override
+            public void onNext(HttpResult<List<ConfIng>> confIngHttpResult) {
+                int code=confIngHttpResult.getCode();
+                String msg=confIngHttpResult.getMsg();
+                List<ConfIng> data=confIngHttpResult.getResult();
+                if(code==0){
+                    confListAdapter.setData(data);
+                    confListAdapter.notifyDataSetChanged();
+                }else{
+
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                refreshLayout.setRefreshing(false);
+                Toast.makeText(ConfManageActivity.this, "error", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onComplete() {
+                refreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     /**
@@ -93,8 +150,8 @@ public class ConferenceManageActivity extends AppCompatActivity implements Navig
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_search:
-                Toast.makeText(this, "search", Toast.LENGTH_SHORT).show();
+            case R.id.action_create_conf:
+                Toast.makeText(this, "create_conf", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;

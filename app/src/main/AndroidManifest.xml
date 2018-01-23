@@ -18,7 +18,7 @@
         </activity>
         <activity android:name=".activity.LoginActivity"/>
         <activity android:name=".activity.RegisterActivity"/>
-        <activity android:name=".activity.ConferenceManageActivity"/>
+        <activity android:name=".activity.ConfManageActivity"/>
     </application>
 
 

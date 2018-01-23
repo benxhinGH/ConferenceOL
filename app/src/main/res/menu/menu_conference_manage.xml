@@ -3,11 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activity.ConferenceManageActivity">
+    tools:context=".activity.ConfManageActivity">
     <item
-        android:id="@+id/action_search"
-        android:title="搜索"
-        android:icon="@drawable/ic_search_white_24dp"
+        android:id="@+id/action_create_conf"
+        android:title="创建会议"
+        android:icon="@drawable/ic_add_white_24dp"
         android:orderInCategory="100"
         app:showAsAction="ifRoom"/>
 </menu>

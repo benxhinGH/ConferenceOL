@@ -1,10 +1,15 @@
 package com.usiellau.conferenceol.network;
 
+import com.usiellau.conferenceol.network.entity.ConfIng;
+import com.usiellau.conferenceol.network.entity.ConfOver;
 import com.usiellau.conferenceol.network.entity.User;
 
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -16,11 +21,28 @@ import retrofit2.http.Query;
 
 public interface ConfSvApi {
     @GET("login")
-    Observable<HttpResult<User>> login(@Query("phonenumber") String phonenumber, @Query("password") String password);
-
+    Observable<HttpResult<User>> login(@Query("phonenumber") String phonenumber,
+                                       @Query("password") String password);
+    @FormUrlEncoded
     @POST("register")
-    Observable<HttpResult> register(@Query("phonenumber") String phonenumber, @Query("authcode") String authcode,@Query("password") String password);
-
+    Observable<HttpResult> register(@Field("phonenumber") String phonenumber,
+                                    @Field("authcode") String authcode,
+                                    @Field("password") String password);
+    @FormUrlEncoded
     @POST("authcode")
-    Observable<HttpResult> sendAuthcode(@Query("phonenumber") String phonenumber);
+    Observable<HttpResult> sendAuthcode(@Field("phonenumber") String phonenumber);
+
+    @GET("conf_ing")
+    Observable<HttpResult<List<ConfIng>>> queryAllConfIng(@Query("selectType")String selectType);
+
+    @GET("conf_over")
+    Observable<HttpResult<List<ConfOver>>> queryAllConfOver(@Query("selectType")String selectType);
+
+    @FormUrlEncoded
+    @POST("conf_ing")
+    Observable<HttpResult<ConfIng>> createConference(@Field("title")String title,
+                                                     @Field("password")String password,
+                                                     @Field("room_id")String roomId,
+                                                     @Field("capacity")int capacity,
+                                                     @Field("creator")String creator);
 }

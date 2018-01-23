@@ -2,10 +2,14 @@ package com.usiellau.conferenceol.network;
 
 import android.util.Log;
 
+import com.usiellau.conferenceol.network.entity.ConfIng;
+import com.usiellau.conferenceol.network.entity.ConfOver;
 import com.usiellau.conferenceol.network.entity.User;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -75,6 +79,31 @@ public class ConfSvMethods {
 
     public void sendAuthcode(Observer<HttpResult> observer,String phonenumber){
         confSvApi.sendAuthcode(phonenumber)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void queryAllConfIng(Observer<HttpResult<List<ConfIng>>> observer){
+        confSvApi.queryAllConfIng("all")
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void queryAllConfOver(Observer<HttpResult<List<ConfOver>>> observer){
+        confSvApi.queryAllConfOver("all")
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void createConference(Observer<HttpResult<ConfIng>> observer,
+                                 String title,String password,String roomId,int capacity,String creator){
+        confSvApi.createConference(title, password, roomId, capacity, creator)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
