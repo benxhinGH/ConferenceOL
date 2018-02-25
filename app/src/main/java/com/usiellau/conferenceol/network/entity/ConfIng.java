@@ -11,6 +11,7 @@ public class ConfIng {
     private String title;
     private String password;
     private String roomId;
+    private String channelId;
     private int capacity;
     private String creator;
     private Timestamp createTime;
@@ -19,11 +20,12 @@ public class ConfIng {
 
     }
 
-    public ConfIng(int id, String title, String password, String roomId, int capacity, String creator, Timestamp createTime) {
+    public ConfIng(int id, String title, String password, String roomId,String channelId, int capacity, String creator, Timestamp createTime) {
         this.id = id;
         this.title = title;
         this.password = password;
         this.roomId = roomId;
+        this.channelId=channelId;
         this.capacity = capacity;
         this.creator = creator;
         this.createTime = createTime;
@@ -83,6 +85,14 @@ public class ConfIng {
 
     public void setCreateTime(Timestamp createTime) {
         this.createTime = createTime;
+    }
+
+    public String getChannelId() {
+        return channelId;
+    }
+
+    public void setChannelId(String channelId) {
+        this.channelId = channelId;
     }
 
     @Override

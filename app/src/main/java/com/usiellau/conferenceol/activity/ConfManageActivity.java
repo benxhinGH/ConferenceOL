@@ -1,6 +1,8 @@
 package com.usiellau.conferenceol.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -13,11 +15,15 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.usiellau.conferenceol.JCWrapper.JCManager;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.adapter.ConfRvAdapter;
 import com.usiellau.conferenceol.network.ConfSvMethods;
@@ -28,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import dmax.dialog.SpotsDialog;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -42,6 +49,8 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
     NavigationView navigationView;
     RecyclerView rvConfList;
     SwipeRefreshLayout refreshLayout;
+
+    SpotsDialog progressDialog;
 
     ConfRvAdapter confListAdapter;
 
@@ -75,6 +84,12 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         rvConfList.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         confListAdapter=new ConfRvAdapter(this,new ArrayList<ConfIng>());
         rvConfList.setAdapter(confListAdapter);
+        confListAdapter.setOnItemClickListener(new ConfRvAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+                showPwdInputDialog(position);
+            }
+        });
 
 
         refreshLayout=findViewById(R.id.refresh_layout);
@@ -86,6 +101,60 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
             }
         });
 
+    }
+
+
+    private void showPwdInputDialog(final int position){
+        MaterialDialog dialog=new MaterialDialog.Builder(this)
+                .input("请输入房间密码", null, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        attemptEnterRoom(position,input.toString());
+                    }
+                })
+                .inputType(InputType.TYPE_TEXT_VARIATION_PASSWORD)
+                .title("提示")
+                .show();
+    }
+
+    private void attemptEnterRoom(int position,String pwd){
+        ConfIng conf=confListAdapter.getData().get(position);
+        if(conf.getPassword().equals(pwd)){
+            enterRoom(conf);
+        }else{
+            Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void enterRoom(ConfIng confIng){
+        ConfSvMethods.getInstance().enterRoom(new Observer<HttpResult>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                showProgressDialog();
+            }
+
+            @Override
+            public void onNext(HttpResult httpResult) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                closeProgressDialog();
+                Toast.makeText(ConfManageActivity.this, "error", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onComplete() {
+                closeProgressDialog();
+            }
+        },confIng.getRoomId(), PreferenceManager.getDefaultSharedPreferences(ConfManageActivity.this).getString(getString(R.string.cloud_setting_last_login_user_id),""));
+        if(JCManager.getInstance().mediaChannel.join(confIng.getChannelId(),null)){
+            Intent intent=new Intent(this,ConferenceActivity.class);
+            intent.putExtra("roomId",confIng.getRoomId());
+            startActivity(intent);
+        }
+        Toast.makeText(this, "进入房间"+confIng.getRoomId(), Toast.LENGTH_SHORT).show();
     }
 
 
@@ -102,6 +171,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
                 int code=confIngHttpResult.getCode();
                 String msg=confIngHttpResult.getMsg();
                 List<ConfIng> data=confIngHttpResult.getResult();
+                Log.d("ConfManageActivity","会议查询记录数："+data.size());
                 if(code==0){
                     confListAdapter.setData(data);
                     confListAdapter.notifyDataSetChanged();
@@ -121,6 +191,17 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
                 refreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    private void showProgressDialog(){
+        if(progressDialog==null){
+            progressDialog=new SpotsDialog(this,R.style.login_progress_dialog);
+        }
+        progressDialog.show();
+    }
+
+    private void closeProgressDialog(){
+        progressDialog.cancel();
     }
 
     /**
@@ -151,7 +232,8 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_create_conf:
-                Toast.makeText(this, "create_conf", Toast.LENGTH_SHORT).show();
+                Intent intent=new Intent(this,CreateConfActivity.class);
+                startActivity(intent);
                 break;
             default:
                 break;

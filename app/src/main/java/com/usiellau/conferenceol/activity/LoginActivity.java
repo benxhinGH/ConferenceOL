@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
+import com.usiellau.conferenceol.JCWrapper.JCManager;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
@@ -49,19 +50,23 @@ public class LoginActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-
     }
 
 
     @OnClick(R.id.btn_login)
     public void clickBtnLogin(){
         ConfSvMethods confSvMethods=ConfSvMethods.getInstance();
-        String username=etUsername.getText().toString();
-        String password=etPassword.getText().toString();
+        final String username=etUsername.getText().toString();
+        final String password=etPassword.getText().toString();
         if(!Utils.isMobiPhoneNum(username)){
             Toast.makeText(this, "非法用户名", Toast.LENGTH_SHORT).show();
             return;
         }
+        if(!JCManager.getInstance().client.login(username,password)){
+            Toast.makeText(this, "登录失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         confSvMethods.login(new Observer<HttpResult<User>>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -74,6 +79,7 @@ public class LoginActivity extends AppCompatActivity{
                 String msg=userHttpResult.getMsg();
                 if(code==0){
                     Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                    JCManager.getInstance().saveLastLogined(username,password);
                     Intent intent=new Intent(LoginActivity.this,ConfManageActivity.class);
                     startActivity(intent);
                     finish();

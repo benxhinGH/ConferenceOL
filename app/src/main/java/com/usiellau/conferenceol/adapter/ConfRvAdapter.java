@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.balysv.materialripple.MaterialRippleLayout;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.entity.ConfIng;
 
@@ -43,7 +44,7 @@ public class ConfRvAdapter extends RecyclerView.Adapter<ConfRvAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.tvConfTitle.setText(confListData.get(position).getTitle());
-        holder.tvRoomId.setText(confListData.get(position).getRoomId());
+        holder.tvRoomId.setText("房间号："+confListData.get(position).getRoomId());
 
         if(onItemClickListener!=null){
             holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +64,9 @@ public class ConfRvAdapter extends RecyclerView.Adapter<ConfRvAdapter.ViewHolder
 
     public void setData(List<ConfIng> data){
         this.confListData=data;
+    }
+    public List<ConfIng> getData(){
+        return confListData;
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {

@@ -43,6 +43,15 @@ public interface ConfSvApi {
     Observable<HttpResult<ConfIng>> createConference(@Field("title")String title,
                                                      @Field("password")String password,
                                                      @Field("room_id")String roomId,
+                                                     @Field("channel_id")String channelId,
                                                      @Field("capacity")int capacity,
                                                      @Field("creator")String creator);
+    @FormUrlEncoded
+    @POST("room")
+    Observable<HttpResult> enterRoom(@Field("room_id")String roomId,
+                                     @Field("phonenumber")String phonenumber);
+    @GET("room")
+    Observable<HttpResult> leaveRoom(@Query("room_id") String roomId,
+                                     @Query("phonenumber") String phonenumber);
+
 }

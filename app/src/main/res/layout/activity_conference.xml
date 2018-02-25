@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.ConferenceActivity"
+    android:id="@+id/contentView">
+
+    <SurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintRight_toLeftOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        app:layout_constraintBottom_toTopOf="parent"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:id="@+id/partpLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clickable="true"
+        android:onClick="onFullScreen"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_constraintTop_creator="1"
+        tools:layout_constraintRight_creator="1"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1">
+
+    </FrameLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/controlLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/partpLayout">
+
+        <Button
+            android:id="@+id/btnShowScreenShare"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onScreenShare"
+            android:text="@string/conference_screen_share"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginTop="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnSwitchCamera" />
+
+        <Button
+            android:id="@+id/btnCdn"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onCdn"
+            android:text="@string/conference_cdn"
+            android:layout_marginTop="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnSwitchCamera"
+            app:layout_constraintLeft_toRightOf="@+id/btnShowScreenShare"/>
+
+        <Button
+            android:id="@+id/btnRecord"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onRecord"
+            android:text="@string/conference_record"
+            app:layout_constraintLeft_toRightOf="@+id/btnCdn"
+            app:layout_constraintBottom_toTopOf="@+id/btnSwitchCamera" />
+
+        <Button
+            android:id="@+id/btnStatistics"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onStatistics"
+            android:text="@string/conference_statistics"
+            app:layout_constraintLeft_toRightOf="@+id/btnRecord"
+            app:layout_constraintBottom_toTopOf="@+id/btnSwitchCamera" />
+
+        <Button
+            android:id="@+id/btnSendMessage"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/conference_message"
+            android:onClick="onSendMessage"
+            app:layout_constraintLeft_toRightOf="@+id/btnStatistics"
+            app:layout_constraintBottom_toTopOf="@+id/btnSwitchCamera" />
+
+        <Button
+            android:id="@+id/btnSendCommand"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/conference_command"
+            android:onClick="onSendCommand"
+            app:layout_constraintLeft_toRightOf="@+id/btnSendMessage"
+            app:layout_constraintBottom_toTopOf="@+id/btnSwitchCamera" />
+
+        <Button
+            android:id="@+id/btnSwitchCamera"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onSwitchCamera"
+            android:text="@string/conference_switch_camera"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent" />
+
+        <Button
+            android:id="@+id/btnSendAudio"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onSendAudio"
+            android:text="@string/conference_send_audio"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/btnSwitchCamera" />
+
+        <Button
+            android:id="@+id/btnSendVideo"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onSendVideo"
+            android:text="@string/conference_send_video"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/btnSendAudio" />
+
+        <Button
+            android:id="@+id/btnAudioOut"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onAudioOut"
+            android:text="@string/conference_audio_out"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/btnSendVideo" />
+
+        <Button
+            android:id="@+id/btnSpeaker"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onSpeaker"
+            android:text="@string/conference_speaker"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/btnAudioOut" />
+
+        <Button
+            android:id="@+id/btnLeave"
+            style="@style/JCButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onLeave"
+            android:text="@string/conference_leave"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/btnSpeaker" />
+    </android.support.constraint.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/textStatistics"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="24dp"
+        android:background="#a0aaaaaa"
+        android:typeface="monospace"
+        android:fadeScrollbars="false"
+        android:scrollbars="vertical"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

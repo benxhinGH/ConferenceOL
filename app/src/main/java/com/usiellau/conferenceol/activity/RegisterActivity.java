@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -36,11 +37,11 @@ public class RegisterActivity extends AppCompatActivity {
     @BindView(R.id.btn_get_authcode)
     Button btnGetAuthcode;
     @BindView(R.id.et_phonenumber)
-    MaterialEditText etPhonenumber;
+    EditText etPhonenumber;
     @BindView(R.id.et_authcode)
-    MaterialEditText etAuthcode;
+    EditText etAuthcode;
     @BindView(R.id.et_password)
-    MaterialEditText etPassword;
+    EditText etPassword;
 
     SpotsDialog progressDialog;
 

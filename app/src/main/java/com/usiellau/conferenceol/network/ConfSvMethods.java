@@ -27,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfSvMethods {
 
-    public static final String BASE_URL="http://192.168.8.109:8080/ConfOL/";
+    public static final String BASE_URL="http://192.168.8.113:8080/ConfOL/";
 
     private static final int DEFAULT_TIMEOUT=5;
 
@@ -102,8 +102,25 @@ public class ConfSvMethods {
     }
 
     public void createConference(Observer<HttpResult<ConfIng>> observer,
-                                 String title,String password,String roomId,int capacity,String creator){
-        confSvApi.createConference(title, password, roomId, capacity, creator)
+                                 String title,String password,String roomId,
+                                 String channelId,int capacity,String creator){
+        confSvApi.createConference(title, password, roomId,channelId, capacity, creator)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void enterRoom(Observer<HttpResult> observer,String roomId,String phonenumber){
+        confSvApi.enterRoom(roomId,phonenumber)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void leaveRoom(Observer<HttpResult> observer,String roomId,String phonenumber){
+        confSvApi.leaveRoom(roomId, phonenumber)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
