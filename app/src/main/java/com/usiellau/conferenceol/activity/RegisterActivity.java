@@ -13,7 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;

@@ -27,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfSvMethods {
 
-    public static final String BASE_URL="http://192.168.8.113:8080/ConfOL/";
+    public static final String BASE_URL="http://192.168.1.101:8080/ConfOL/";
 
     private static final int DEFAULT_TIMEOUT=5;
 

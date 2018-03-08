@@ -17,16 +17,7 @@
     <string name="pref_title_conference_max_num">Conference Max Num(2-16)</string>
     <string name="pref_server_default_value">http:router.justalkcloud.com:8080</string>
 
-    <!-- Strings prompt -->
-    <string name="prompt_login_userid">Number, character,  \'-\' or \'_\', length less than 64</string>
-    <string name="prompt_userid">UserId</string>
-    <string name="prompt_password">Password</string>
-    <string name="prompt_file_type">FileType</string>
-    <string name="prompt_content_uri">Content/Uri</string>
-    <string name="prompt_file_path">Path/Url</string>
-    <string name="prompt_group">GroupName/UserId/DisplayName/GroupId/Content</string>
-    <string name="prompt_group_item">"Long Click Item to Enter IM Activity"</string>
-    <string name="prompt_login_fail">Login Fail</string>
+
 
     <!-- Strings related to login -->
     <string name="title_activity_login">Login</string>
@@ -47,61 +38,7 @@
     <string name="cloud_setting_last_login_user_id">LastLoginUserId</string>
     <string name="cloud_setting_last_login_password">LastLoginPassword</string>
 
-    <!-- CallFragment -->
-    <string name="call_audio">Audio</string>
-    <string name="call_video">Video</string>
-    <string name="call_conference">Conference Mode(Audio)</string>
-    <string name="call_max_call_setting_fmt">Max Call Num=%1$d\nAudid Conference Mode=%2$b</string>
 
-    <!-- MessageFragment -->
-    <string name="message_send_text">Send Text</string>
-    <string name="message_send_file">Send File</string>
-    <string name="message_clear">Clear</string>
-
-    <!-- StorageFragment -->
-    <string name="storage_text">Storage Text</string>
-    <string name="storage_upload">Upload</string>
-    <string name="storage_download">Download</string>
-    <string name="storage_choose">Choose</string>
-    <string name="storage_transferring">Transferring: </string>
-    <string name="storage_download_ok">Download ok, file is kept in </string>
-    <string name="storage_upload_ok">Upload Ok</string>
-    <string name="storage_transfer_failed">Transfer Failed</string>
-    <string name="storage_download_uri">Download Uri: </string>
-
-    <!-- CallActivity -->
-    <string name="call_term">Term</string>
-    <string name="call_audio_answer">Audio Answer</string>
-    <string name="call_video_answer">Video Answer</string>
-    <string name="call_hold">Hold</string>
-    <string name="call_mute">Mute</string>
-    <string name="call_switch_camera">Switch Camera</string>
-    <string name="call_onoff_camera">On/Off Camera</string>
-    <string name="call_speaker">Speaker</string>
-    <string name="call_add">Add</string>
-    <string name="call_statistics">Statistics</string>
-    <string name="tip_answer_call">Answer Call?</string>
-    <string name="tip_enter_userid">Enter UserId</string>
-
-    <!-- ConferenceFragment -->
-    <string name="prompt_channelid">ChannelId</string>
-    <string name="conference_join">Join</string>
-    <string name="conference_query">Query</string>
-    <string name="conference_pstn">Pstn Call</string>
-    <string name="conference_pstn_check">Pstn Call</string>
-    <string name="conference_pstn_info">要测试PSTN落地呼叫，请确保AppKey对应后台已对接了落地服务，然后ChannelId填入号码点击"Pstn Call"按钮进行落地呼叫</string>
-
-    <!-- GroupFragment -->
-    <string name="group_fetch">Fetch</string>
-    <string name="group_fetch_info">Fetch Info</string>
-    <string name="group_create">Create(Owner)</string>
-    <string name="group_dissolve">Dissolve(Owner)</string>
-    <string name="group_leave">Leave(Member)</string>
-    <string name="group_add_member">Add Member</string>
-    <string name="group_kick_member">Kick Member(Owner)</string>
-    <string name="group_modify_displayname">Modify Display Name</string>
-    <string name="group_modify_groupname">Modify Group Name</string>
-    <string name="group_send_message">Send Message</string>
 
     <!-- ConferenceActivity -->
     <string name="conference_leave">Leave</string>
@@ -117,39 +54,8 @@
     <string name="conference_message">Message</string>
     <string name="conference_command">Command</string>
 
-    <!-- IMActivity -->
-    <string name="im_send">Send</string>
-
-    <!-- Error -->
-    <string name="error_field_required">This field is required</string>
-    <string name="error_call_function">Call Function Error</string>
-
-    <!-- Common -->
-    <string name="tip">Tip</string>
-    <string name="answer">Answer</string>
-    <string name="decline">Decline</string>
-    <string name="not_login">Not Login</string>
-    <string name="logining">Logining</string>
-    <string name="repress_back_exit">RePress Back to Exit</string>
-    <string name="me">Me</string>
-
-    <string name="title_activity_statistics">Statistics</string>
 
 
-    <string-array name="tab_titles">
-        <item>1To1</item>
-        <item>Multi</item>
-        <item>Message</item>
-        <item>Storage</item>
-        <item>Group</item>
-    </string-array>
 
-    <string-array name="commands">
-        <item>StartForward</item>
-        <item>StopForward</item>
-        <item>ChangeTitle</item>
-        <item>SetPartpProp</item>
-        <item>ReplayApplyLayout</item>
-        <item>ReplayApplyMode</item>
-    </string-array>
+
 </resources>

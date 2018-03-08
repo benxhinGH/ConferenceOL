@@ -51,7 +51,7 @@ import java.util.List;
  * 本类主要是对Juphoon Cloud SDK 的简单封装
  */
 public class JCManager implements JCClientCallback, JCCallCallback, JCMediaChannelCallback, JCMediaDeviceCallback,
-        JCStorageCallback, JCGroupCallback, JCMessageChannelCallback {
+        JCStorageCallback,  JCMessageChannelCallback {
 
     private static String AppKey="0dc657108b5a6e5eefe44097";
 
@@ -211,6 +211,17 @@ public class JCManager implements JCClientCallback, JCCallCallback, JCMediaChann
 
     @Override
     public void onParticipantUpdate(JCMediaChannelParticipant participant) {
+        Log.e("JCManager","收到onParticipantUpdate回调,participant状态："+
+        "\ngetDisplayName:"+participant.getDisplayName()+
+        "\ngetPictureSize:"+participant.getPictureSize()+
+        "\ngetRenderId:"+participant.getRenderId()+
+        "\ngetType:"+participant.getType()+
+        "\ngetUserId:"+participant.getUserId()+
+        "\ngetVolumnStatus:"+participant.getVolumeStatus()+
+        "\nisAudio:"+participant.isAudio()+
+        "\nisTalking:"+participant.isTalking()+
+        "\nisVideo:"+participant.isVideo());
+
         EventBus.getDefault().post(new JCEvent(JCEvent.EventType.CONFERENCE_PARTP_UPDATE));
     }
 
@@ -294,138 +305,7 @@ public class JCManager implements JCClientCallback, JCCallCallback, JCMediaChann
         EventBus.getDefault().post(new JCStorageEvent(jcStorageItem));
     }
 
-    @Override
-    public void onFetchGroups(int operationId, boolean result, @JCGroup.Reason int reason, List<JCGroupItem> groups, long updateTime, boolean fullUpdated) {
-        if (result) {
-            JCGroupData.gourpListUpdateTime = updateTime;
-            // 演示群列表更新操作，demo是存入内存，实际应同步到数据库
-            for (JCGroupItem item : groups) {
-                if (item.changeState == JCGroup.GROUP_CHANGE_STATE_ADD) {
-                    boolean find = false;
-                    for (JCGroupItem temp : JCGroupData.listGroups) {
-                        if (TextUtils.equals(temp.groupId, item.groupId)) {
-                            find = true;
-                            break;
-                        }
-                    }
-                    if (!find) {
-                        JCGroupData.listGroups.add(0, item);
-                    }
-                    // 添加群组则去拉下详情
-                   // group.fetchGroupInfo(item.groupId, JCGroupData.getFetchGroupInfoLastTime(item.groupId));
-                } else if (item.changeState == JCGroup.GROUP_CHANGE_STATE_UPDATE) {
-                    for (JCGroupItem temp : JCGroupData.listGroups) {
-                        if (TextUtils.equals(temp.groupId, item.groupId)) {
-                            JCGroupData.listGroups.remove(temp);
-                            break;
-                        }
-                    }
-                    JCGroupData.listGroups.add(0, item);
-                } else if (item.changeState == JCGroup.GROUP_CHANGE_STATE_REMOVE) {
-                    for (JCGroupItem temp : JCGroupData.listGroups) {
-                        if (TextUtils.equals(temp.groupId, item.groupId)) {
-                            // 删除该群组缓存
-                            JCGroupData.mapGroupMembers.remove(item.groupId);
-                            JCGroupData.listGroups.remove(temp);
-                            JCGroupData.mapGroupUpdateTime.remove(item.groupId);
-                            JCMessageData.removeMessages(item.groupId);
-                            break;
-                        }
-                    }
-                }
-            }
-            EventBus.getDefault().post(new JCEvent(JCEvent.EventType.GROUP_LIST));
-        }
-    }
 
-    @Override
-    public void onFetchGroupInfo(int operationId, boolean result, @JCGroup.Reason int reason, JCGroupItem groupItem, List<JCGroupMember> members, long updateTime, boolean fullUpdated) {
-        if (result) {
-            // 演示群列表更新操作，demo是存入内存，实际应同步到数据库
-            JCGroupData.setFetchGroupInfoLastTime(groupItem.groupId, updateTime);
-            List<JCGroupMember> saveMembers = null;
-            if (JCGroupData.mapGroupMembers.containsKey(groupItem.groupId)) {
-                saveMembers = JCGroupData.mapGroupMembers.get(groupItem.groupId);
-            } else {
-                saveMembers = new ArrayList<>();
-                JCGroupData.mapGroupMembers.put(groupItem.groupId, saveMembers);
-            }
-            for (JCGroupItem item : JCGroupData.listGroups) {
-                if (TextUtils.equals(item.groupId, groupItem.groupId)) {
-                    JCGroupData.listGroups.remove(item);
-                    JCGroupData.listGroups.add(groupItem);
-                    break;
-                }
-            }
-            for (JCGroupMember member : members) {
-                if (member.changeState == JCGroup.GROUP_CHANGE_STATE_ADD) {
-                    boolean find = false;
-                    for (JCGroupMember temp : saveMembers) {
-                        if (TextUtils.equals(temp.userId, member.userId)) {
-                            find = true;
-                            break;
-                        }
-                    }
-                    if (!find) {
-                        saveMembers.add(member);
-                    }
-                } else if (member.changeState == JCGroup.GROUP_CHANGE_STATE_UPDATE) {
-                    for (JCGroupMember temp : saveMembers) {
-                        if (TextUtils.equals(temp.userId, member.userId)) {
-                            saveMembers.remove(temp);
-                            break;
-                        }
-                    }
-                    saveMembers.add(member);
-                } else if (member.changeState == JCGroup.GROUP_CHANGE_STATE_REMOVE) {
-                    for (JCGroupMember temp : saveMembers) {
-                        // 删除只能根据uid来进行判断
-                        if (TextUtils.equals(temp.uid, member.uid)) {
-                            saveMembers.remove(temp);
-                            break;
-                        }
-                    }
-                }
-            }
-            EventBus.getDefault().post(new JCEvent(JCEvent.EventType.GROUP_INFO));
-        }
-    }
-
-    @Override
-    public void onGroupListChange() {
-        //group.fetchGroups(JCGroupData.gourpListUpdateTime);
-    }
-
-    @Override
-    public void onGroupInfoChange(String groupId) {
-        //group.fetchGroupInfo(groupId, JCGroupData.getFetchGroupInfoLastTime(groupId));
-    }
-
-    @Override
-    public void onCreateGroup(int operationId, boolean result, @JCGroup.Reason int reason, JCGroupItem groupItem) {
-        if (!result) {
-            Toast.makeText(mContext, "创建群失败", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onUpdateGroup(int operationId, boolean result, @JCGroup.Reason int reason, String groupId) {
-        //group.fetchGroupInfo(groupId, JCGroupData.getFetchGroupInfoLastTime(groupId));
-    }
-
-    @Override
-    public void onDissolve(int operationId, boolean result, @JCGroup.Reason int reason, String groupId) {
-
-    }
-
-    @Override
-    public void onLeave(int operationId, boolean result, @JCGroup.Reason int reason, String groupId) {
-
-    }
-
-    @Override
-    public void onDealMembers(int operationId, boolean result, @JCGroup.Reason int reason) {
-    }
 
     private static final class JCManagerHolder {
         private static final JCManager INSTANCE = new JCManager();

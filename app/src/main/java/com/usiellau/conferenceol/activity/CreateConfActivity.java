@@ -11,10 +11,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.gildaswise.horizontalcounter.HorizontalCounter;
-import com.rengwuxian.materialedittext.MaterialEditText;
 import com.usiellau.conferenceol.JCWrapper.JCEvent.JCConfQueryEvent;
 import com.usiellau.conferenceol.JCWrapper.JCEvent.JCEvent;
 import com.usiellau.conferenceol.JCWrapper.JCManager;
@@ -28,14 +28,12 @@ import com.usiellau.conferenceol.util.Utils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import okhttp3.internal.Util;
 
 /**
  * Created by UsielLau on 2018/1/24 0024 1:36.
@@ -48,9 +46,9 @@ public class CreateConfActivity extends AppCompatActivity {
     Toolbar toolbar;
 
     @BindView(R.id.et_conf_title)
-    MaterialEditText etConfTitle;
+    EditText etConfTitle;
     @BindView(R.id.et_conf_password)
-    MaterialEditText etConfPassword;
+    EditText etConfPassword;
     @BindView(R.id.capacity_counter)
     HorizontalCounter counter;
 
