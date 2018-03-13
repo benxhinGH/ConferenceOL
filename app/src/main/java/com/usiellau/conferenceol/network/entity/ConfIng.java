@@ -10,25 +10,54 @@ public class ConfIng {
     private int id;
     private String title;
     private String password;
-    private String roomId;
     private String channelId;
     private int capacity;
+    private int online;
+    private String member;
     private String creator;
     private Timestamp createTime;
+    private String participator;
 
     public ConfIng(){
 
     }
 
-    public ConfIng(int id, String title, String password, String roomId,String channelId, int capacity, String creator, Timestamp createTime) {
+    public ConfIng(int id, String title, String password, String channelId, int capacity,
+                   int online, String member, String creator, Timestamp createTime, String participator) {
         this.id = id;
         this.title = title;
         this.password = password;
-        this.roomId = roomId;
-        this.channelId=channelId;
+        this.channelId = channelId;
         this.capacity = capacity;
+        this.online = online;
+        this.member = member;
         this.creator = creator;
         this.createTime = createTime;
+        this.participator = participator;
+    }
+
+    public int getOnline() {
+        return online;
+    }
+
+    public void setOnline(int online) {
+        this.online = online;
+    }
+
+    public String getMember() {
+        return member;
+    }
+
+    public void setMember(String member) {
+        this.member = member;
+    }
+
+    public String getParticipator() {
+        return participator;
+    }
+
+    public void setParticipator(String participator) {
+        this.participator = participator;
     }
 
     public int getId() {
@@ -43,9 +72,6 @@ public class ConfIng {
         return password;
     }
 
-    public String getRoomId() {
-        return roomId;
-    }
 
     public int getCapacity() {
         return capacity;
@@ -69,10 +95,6 @@ public class ConfIng {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
     }
 
     public void setCapacity(int capacity) {
@@ -101,7 +123,6 @@ public class ConfIng {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", password='" + password + '\'' +
-                ", roomId='" + roomId + '\'' +
                 ", capacity=" + capacity +
                 ", creator='" + creator + '\'' +
                 ", createTime=" + createTime +

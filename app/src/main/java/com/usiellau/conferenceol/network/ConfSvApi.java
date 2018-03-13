@@ -33,7 +33,8 @@ public interface ConfSvApi {
     Observable<HttpResult> sendAuthcode(@Field("phonenumber") String phonenumber);
 
     @GET("conf_ing")
-    Observable<HttpResult<List<ConfIng>>> queryAllConfIng(@Query("selectType")String selectType);
+    Observable<HttpResult<List<ConfIng>>> queryConfIng(@Query("selectType")String selectType,
+                                                          @Query("channelId")String channelId);
 
     @GET("conf_over")
     Observable<HttpResult<List<ConfOver>>> queryAllConfOver(@Query("selectType")String selectType);
@@ -42,16 +43,16 @@ public interface ConfSvApi {
     @POST("conf_ing")
     Observable<HttpResult<ConfIng>> createConference(@Field("title")String title,
                                                      @Field("password")String password,
-                                                     @Field("room_id")String roomId,
                                                      @Field("channel_id")String channelId,
                                                      @Field("capacity")int capacity,
                                                      @Field("creator")String creator);
     @FormUrlEncoded
     @POST("room")
-    Observable<HttpResult> enterRoom(@Field("room_id")String roomId,
+    Observable<HttpResult> enterRoom(@Field("channel_id")String channelId,
                                      @Field("phonenumber")String phonenumber);
     @GET("room")
-    Observable<HttpResult> leaveRoom(@Query("room_id") String roomId,
+    Observable<HttpResult> leaveRoom(@Query("channel_id") String channelId,
                                      @Query("phonenumber") String phonenumber);
+
 
 }

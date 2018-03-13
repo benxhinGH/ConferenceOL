@@ -85,8 +85,8 @@ public class ConfSvMethods {
                 .subscribe(observer);
     }
 
-    public void queryAllConfIng(Observer<HttpResult<List<ConfIng>>> observer){
-        confSvApi.queryAllConfIng("all")
+    public void queryConfIng(Observer<HttpResult<List<ConfIng>>> observer,String selectType,String channelId){
+        confSvApi.queryConfIng(selectType,channelId)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -102,9 +102,9 @@ public class ConfSvMethods {
     }
 
     public void createConference(Observer<HttpResult<ConfIng>> observer,
-                                 String title,String password,String roomId,
+                                 String title,String password,
                                  String channelId,int capacity,String creator){
-        confSvApi.createConference(title, password, roomId,channelId, capacity, creator)
+        confSvApi.createConference(title, password,channelId, capacity, creator)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

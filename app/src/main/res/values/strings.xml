@@ -3,6 +3,8 @@
     <string name="drawer_open">drawer open</string>
     <string name="drawer_close">drawer close</string>
 
+    <string name="agora_sdk_id">60cac4d6e7d14450b9a5de254fffa0d1</string>
+
 
     <string name="title_activity_settings">Settings</string>
 
@@ -53,6 +55,10 @@
     <string name="conference_statistics">Statistics</string>
     <string name="conference_message">Message</string>
     <string name="conference_command">Command</string>
+
+    <string name="action_participant_join">com.usiellau.comferenceol.partp.join</string>
+    <string name="action_participant_leave">com.usiellau.comferenceol.partp.leave</string>
+    <string name="action_participant_update">com.usiellau.comferenceol.partp.update</string>
 
 
 

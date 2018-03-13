@@ -7,16 +7,7 @@
     tools:context=".activity.ConferenceActivity"
     android:id="@+id/contentView">
 
-    <Button
-        android:id="@+id/btnLeave"
-        style="@style/JCButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="8dp"
-        android:onClick="onLeave"
-        android:text="@string/conference_leave"/>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -26,14 +17,13 @@
             android:id="@+id/video_main"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clickable="true"
-            android:onClick="onFullScreen"
             />
         <android.support.v7.widget.RecyclerView
             android:id="@+id/partp_list"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"/>
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"/>
     </RelativeLayout>
 
 
@@ -61,7 +51,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onSendAudio"
-            android:text="@string/conference_send_audio" />
+            android:text="SendA" />
 
         <Button
             android:id="@+id/btnSendVideo"
@@ -70,7 +60,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="onSendVideo"
-            android:text="@string/conference_send_video" />
+            android:text="SendV" />
+        <Button
+            android:id="@+id/btnAudioOut"
+            style="@style/JCButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="onAudioOut"
+            android:text="AudioO" />
 
         <Button
             android:id="@+id/btnSpeaker"
@@ -83,6 +81,18 @@
 
          />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnLeave"
+        style="@style/JCButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="8dp"
+        android:onClick="onLeave"
+        android:text="@string/conference_leave"/>
 
 
 </RelativeLayout>

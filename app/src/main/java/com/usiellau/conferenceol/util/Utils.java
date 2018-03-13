@@ -5,11 +5,14 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+
+import com.usiellau.conferenceol.R;
 
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -20,6 +23,16 @@ import java.util.regex.Pattern;
  */
 
 public class Utils {
+
+    // 保存最后一次登录账号信息
+    public static void saveLastLogined(Context context,int uid,String username, String password) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putInt("uid",uid)
+                .putString("username", username)
+                .putString("password", password)
+                .apply();
+    }
+
     public static boolean isMobiPhoneNum(String telNum){
         String regex = "^((13[0-9])|(15[0-9])|(18[0-9]))\\d{8}$";
         Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.usiellau.conferenceol"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -46,5 +46,6 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'org.greenrobot:eventbus:3.1.1'
+    compile 'io.agora.rtc:full-sdk:2.1.0'
 
 }

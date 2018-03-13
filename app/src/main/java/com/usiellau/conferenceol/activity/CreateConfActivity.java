@@ -15,9 +15,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.gildaswise.horizontalcounter.HorizontalCounter;
-import com.usiellau.conferenceol.JCWrapper.JCEvent.JCConfQueryEvent;
-import com.usiellau.conferenceol.JCWrapper.JCEvent.JCEvent;
-import com.usiellau.conferenceol.JCWrapper.JCManager;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
@@ -26,8 +23,6 @@ import com.usiellau.conferenceol.util.Utils;
 
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -78,17 +73,7 @@ public class CreateConfActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        EventBus.getDefault().register(this);
-    }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        EventBus.getDefault().unregister(this);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -100,7 +85,7 @@ public class CreateConfActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_submit:
-                createConference();
+                createRoom();
                 break;
                 default:
                     break;
@@ -108,47 +93,14 @@ public class CreateConfActivity extends AppCompatActivity {
         return true;
     }
 
-    private void createConference(){
+
+    private void createRoom(){
         final String channelId= Utils.getUUID();
-
-        if(!JCManager.getInstance().mediaChannel.join(channelId,null)){
-            Toast.makeText(this, "创建失败", Toast.LENGTH_SHORT).show();
-            return;
-        }else{
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    JCManager.getInstance().mediaChannel.query(channelId);
-                    Log.d(TAG,"创建频道成功，查询频道信息");
-                }
-            },1000);
-        }
-
-    }
-
-
-    @Subscribe
-    public void onEvent(JCEvent event) {
-        if (event.getEventType() == JCEvent.EventType.CONFERENCE_QUERY) {
-            JCConfQueryEvent queryEvent = (JCConfQueryEvent) event;
-            if (queryEvent.result) {
-                String roomId=String.valueOf(queryEvent.queryInfo.getNumber());
-                String channelId=queryEvent.queryInfo.getChannelId();
-                Log.d(TAG,"查询频道信息成功，roomId"+roomId+"channelId"+channelId);
-                createRoom(roomId,channelId);
-            } else {
-                Toast.makeText(this, "查询失败", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void createRoom(final String roomId,String channelId){
         String title=etConfTitle.getText().toString();
         String password=etConfPassword.getText().toString();
         int capacity=(int)(counter.getCurrentValue()/1);
-        String creator= PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.cloud_setting_last_login_user_id),"");
+        String creator= PreferenceManager.getDefaultSharedPreferences(this).getString("username","");
 
-        Log.d(TAG,"创建房间111111111111111111111");
         ConfSvMethods.getInstance().createConference(new Observer<HttpResult<ConfIng>>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -161,7 +113,7 @@ public class CreateConfActivity extends AppCompatActivity {
                 String msg=confIngHttpResult.getMsg();
                 if(code==0){
                     Toast.makeText(CreateConfActivity.this, "创建成功", Toast.LENGTH_SHORT).show();
-                    enterRoom(roomId);
+                    enterRoom(channelId);
                 }else{
                     Toast.makeText(CreateConfActivity.this, "创建失败", Toast.LENGTH_SHORT).show();
                 }
@@ -178,13 +130,13 @@ public class CreateConfActivity extends AppCompatActivity {
             public void onComplete() {
                 closeProgressDialog();
             }
-        },title,password,roomId,channelId,capacity,creator);
+        },title,password,channelId,capacity,creator);
     }
 
 
 
-    private void enterRoom(final String roomId){
-        Log.d("CreateConfActivity","进入房间："+roomId);
+    private void enterRoom(final String channelId){
+        Log.d("CreateConfActivity","进入房间："+channelId);
         ConfSvMethods.getInstance().enterRoom(new Observer<HttpResult>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -198,10 +150,11 @@ public class CreateConfActivity extends AppCompatActivity {
                 if(code==0){
                     Toast.makeText(CreateConfActivity.this, "进入房间成功", Toast.LENGTH_SHORT).show();
                     Intent intent=new Intent(CreateConfActivity.this,ConferenceActivity.class);
-                    intent.putExtra("roomId",roomId);
+                    intent.putExtra("channelId",channelId);
                     startActivity(intent);
                     finish();
                 }else{
+                    Log.d(TAG,"进入房间失败,code："+code+"msg:"+msg);
                     Toast.makeText(CreateConfActivity.this, "进入房间失败", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -216,7 +169,7 @@ public class CreateConfActivity extends AppCompatActivity {
             public void onComplete() {
                 closeProgressDialog();
             }
-        },roomId,PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.cloud_setting_last_login_user_id),""));
+        },channelId,PreferenceManager.getDefaultSharedPreferences(this).getString("username",""));
     }
 
 

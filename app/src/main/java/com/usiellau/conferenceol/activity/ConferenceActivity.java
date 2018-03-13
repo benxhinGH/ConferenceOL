@@ -1,40 +1,39 @@
 package com.usiellau.conferenceol.activity;
 
-import android.os.Handler;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
-import android.content.Context;
-import android.media.AudioManager;
-import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.SurfaceView;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.juphoon.cloud.JCMediaDevice;
-import com.juphoon.cloud.JCMediaDeviceVideoCanvas;
-import com.usiellau.conferenceol.JCWrapper.JCEvent.JCConfMessageEvent;
-import com.usiellau.conferenceol.JCWrapper.JCEvent.JCEvent;
-import com.usiellau.conferenceol.JCWrapper.JCEvent.JCJoinEvent;
-import com.usiellau.conferenceol.JCWrapper.JCManager;
+
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.adapter.PartpListAdapter;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
-import com.usiellau.conferenceol.util.Utils;
+import com.usiellau.conferenceol.network.entity.ConfIng;
+import com.usiellau.conferenceol.tools.IdConverter;
 
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.agora.rtc.Constants;
+import io.agora.rtc.IRtcEngineEventHandler;
+import io.agora.rtc.RtcEngine;
+import io.agora.rtc.video.VideoCanvas;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -43,6 +42,18 @@ import io.reactivex.disposables.Disposable;
  */
 
 public class ConferenceActivity extends AppCompatActivity {
+
+    private static final String LOG_TAG = ConferenceActivity.class.getSimpleName();
+
+    private static final int PERMISSION_REQ_ID_RECORD_AUDIO = 22;
+    private static final int PERMISSION_REQ_ID_CAMERA = PERMISSION_REQ_ID_RECORD_AUDIO + 1;
+
+    private boolean isVideoSend=true;
+    private boolean isAudioSend=true;
+    private boolean isSpeaker=false;
+    private boolean isRemoteAudio=true;
+
+
 
     @BindView(R.id.video_main)
     FrameLayout videoMain;
@@ -58,84 +69,159 @@ public class ConferenceActivity extends AppCompatActivity {
     RecyclerView partpList;
     private PartpListAdapter adapter;
 
-    private boolean mFullScreen;
-    private String roomId;
+    private RtcEngine mRtcEngine;
 
-    private JCMediaDeviceVideoCanvas videoCanvasMain;
+    private String channelId;
 
-    private Handler handler=new Handler();
+    private final IRtcEngineEventHandler mRtcEventHandler = new IRtcEngineEventHandler() { // Tutorial Step 1
+
+
+        @Override
+        public void onUserJoined(final int uid, int elapsed) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.onRemoteUserJoined(uid);
+                }
+            });
+        }
+
+        @Override
+        public void onUserOffline(final int uid, int reason) { // Tutorial Step 7
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.onRemoteUserLeft(uid);
+                }
+            });
+        }
+
+        @Override
+        public void onUserMuteVideo(final int uid, final boolean muted) { // Tutorial Step 10
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.onRemoteUserVideoMuted(uid,muted);
+                }
+            });
+        }
+
+        @Override
+        public void onUserMuteAudio(final int uid, final boolean muted) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.onRemoteUserAudioMuted(uid, muted);
+                }
+            });
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_conference);
         ButterKnife.bind(this);
-        mFullScreen = false;
-        EventBus.getDefault().register(this);
-        roomId=getIntent().getStringExtra("roomId");
+        channelId=getIntent().getStringExtra("channelId");
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO, PERMISSION_REQ_ID_RECORD_AUDIO) && checkSelfPermission(Manifest.permission.CAMERA, PERMISSION_REQ_ID_CAMERA)) {
+            initAgoraEngineAndJoinChannel();
+        }
+        partpList.setLayoutManager(new LinearLayoutManager(this));
+        adapter=new PartpListAdapter(this,mRtcEngine);
+        partpList.setAdapter(adapter);
     }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        switchFullScreen();
-        partpList.setLayoutManager(new LinearLayoutManager(this));
-        adapter=new PartpListAdapter(this);
-        partpList.setAdapter(adapter);
-        updateVideoMain();
-        updateControlButtons();
-        handler.postDelayed(new Runnable() {
+        initRemoteVideo();
+    }
+
+    public boolean checkSelfPermission(String permission, int requestCode) {
+        Log.i(LOG_TAG, "checkSelfPermission " + permission + " " + requestCode);
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        Log.i(LOG_TAG, "onRequestPermissionsResult " + grantResults[0] + " " + requestCode);
+
+        switch (requestCode) {
+            case PERMISSION_REQ_ID_RECORD_AUDIO: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkSelfPermission(Manifest.permission.CAMERA, PERMISSION_REQ_ID_CAMERA);
+                } else {
+                    showLongToast("No permission for " + Manifest.permission.RECORD_AUDIO);
+                    finish();
+                }
+                break;
+            }
+            case PERMISSION_REQ_ID_CAMERA: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initAgoraEngineAndJoinChannel();
+                } else {
+                    showLongToast("No permission for " + Manifest.permission.CAMERA);
+                    finish();
+                }
+                break;
+            }
+        }
+    }
+
+    public final void showLongToast(final String msg) {
+        this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                adapter.updatePartp();
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
             }
-        },1000);
+        });
     }
+
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        adapter.destory();
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        EventBus.getDefault().unregister(this);
-        if (videoCanvasMain!=null)
-        JCManager.getInstance().mediaDevice.stopVideo(videoCanvasMain);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            int direction = keyCode == KeyEvent.KEYCODE_VOLUME_UP ? AudioManager.ADJUST_RAISE : AudioManager.ADJUST_LOWER;
-            int flags = AudioManager.FX_FOCUS_NAVIGATION_UP;
-            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            am.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL, direction, flags);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+
 
     public void onSwitchCamera(View view) {
-        JCManager.getInstance().mediaDevice.switchCamera();
+        mRtcEngine.switchCamera();
     }
 
     public void onSendAudio(View view) {
-        JCManager.getInstance().mediaChannel.enableUploadAudioStream(!JCManager.getInstance().mediaChannel.getUploadLocalAudio());
+        mRtcEngine.muteLocalAudioStream(isAudioSend);
+        isAudioSend=!isAudioSend;
     }
 
     public void onSendVideo(View view) {
-        JCManager.getInstance().mediaChannel.enableUploadVideoStream(!JCManager.getInstance().mediaChannel.getUploadLocalVideo());
+        mRtcEngine.muteLocalVideoStream(isVideoSend);
+        isVideoSend=!isVideoSend;
+        SurfaceView surfaceView=(SurfaceView)videoMain.getChildAt(0);
+        surfaceView.setVisibility(isVideoSend?View.VISIBLE:View.GONE);
     }
 
-
+    public void onAudioOut(View view) {
+        mRtcEngine.muteAllRemoteAudioStreams(isRemoteAudio);
+        isRemoteAudio=!isRemoteAudio;
+    }
 
     public void onSpeaker(View view) {
-        JCManager.getInstance().mediaDevice.enableSpeaker(!JCManager.getInstance().mediaDevice.isSpeakerOn());
-        updateControlButtons();
+        mRtcEngine.setEnableSpeakerphone(!isSpeaker);
+        isSpeaker=!isSpeaker;
     }
 
     public void onLeave(View view) {
-        JCManager.getInstance().mediaChannel.leave();
+        mRtcEngine.leaveChannel();
         ConfSvMethods.getInstance().leaveRoom(new Observer<HttpResult>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -159,65 +245,88 @@ public class ConferenceActivity extends AppCompatActivity {
             public void onComplete() {
 
             }
-        },roomId, PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.cloud_setting_last_login_user_id),""));
+        },channelId, PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("username",""));
         finish();
     }
 
-    public void updateVideoMain(){
-        videoCanvasMain=JCManager.getInstance().mediaDevice.startCameraVideo(JCMediaDevice.RENDER_FULL_CONTENT);
-        videoMain.addView(videoCanvasMain.getVideoView(),0);
+
+
+
+    private void initAgoraEngineAndJoinChannel(){
+        initializeAgoraEngine();     // Tutorial Step 1
+        setupVideoProfile();         // Tutorial Step 2
+        setupLocalVideo();           // Tutorial Step 3
+        joinChannel();
+    }
+    // Tutorial Step 1
+    private void initializeAgoraEngine() {
+        try {
+            mRtcEngine = RtcEngine.create(getBaseContext(), getString(R.string.agora_sdk_id), mRtcEventHandler);
+            mRtcEngine.setDefaultAudioRoutetoSpeakerphone(false);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+
+            throw new RuntimeException("NEED TO check rtc sdk init fatal error\n" + Log.getStackTraceString(e));
+        }
     }
 
-
-
-    public void onFullScreen(View view) {
-        mFullScreen = !mFullScreen;
-        switchFullScreen();
+    // Tutorial Step 2
+    private void setupVideoProfile() {
+        mRtcEngine.enableVideo();
+        mRtcEngine.setVideoProfile(Constants.VIDEO_PROFILE_360P, false);
     }
 
-    @Subscribe
-    public void onEvent(JCEvent event) {
-        if (event.getEventType() == JCEvent.EventType.CONFERENCE_JOIN) {
-            JCJoinEvent join = (JCJoinEvent) event;
-            if (join.result) {
-                updateVideoMain();
-                Log.e("ConferenceActivity","收到CONFERENCE_JOIN消息，调用updatePartp");
-                adapter.updatePartp();
-            } else {
-                finish();
+    // Tutorial Step 3
+    private void setupLocalVideo() {
+        FrameLayout container = findViewById(R.id.video_main);
+        SurfaceView surfaceView = RtcEngine.CreateRendererView(getBaseContext());
+        container.addView(surfaceView);
+        mRtcEngine.setupLocalVideo(new VideoCanvas(surfaceView, VideoCanvas.RENDER_MODE_ADAPTIVE,
+                PreferenceManager.getDefaultSharedPreferences(this).getInt("uid",0)));
+    }
+
+    // Tutorial Step 4
+    private void joinChannel() {
+        mRtcEngine.joinChannel(null, channelId, "Extra Optional Data",
+                PreferenceManager.getDefaultSharedPreferences(this).getInt("uid",0)); // if you do not specify the uid, we will generate the uid for you
+    }
+
+    private void initRemoteVideo(){
+        ConfSvMethods.getInstance().queryConfIng(new Observer<HttpResult<List<ConfIng>>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
             }
-        } else if (event.getEventType() == JCEvent.EventType.CONFERENCE_LEAVE) {
-            finish();
-        } else if (event.getEventType() == JCEvent.EventType.CONFERENCE_PARTP_JOIN
-                || event.getEventType() == JCEvent.EventType.CONFERENCE_PARTP_LEAVE) {
-            Log.e("ConferenceActivity","收到CONFERENCE_PARTP_JOIN消息，调用updatePartp");
-            adapter.updatePartp();
-        } else if (event.getEventType() == JCEvent.EventType.CONFERENCE_PARTP_UPDATE) {
-            Log.e("ConferenceActivity","收到CONFERENCE_PARTP_UPDATE消息，调用updatePartp");
-            adapter.updatePartp();
-        } else if (event.getEventType() == JCEvent.EventType.CONFERENCE_PROP_CHANGE) {
-            updateControlButtons();
-        } else if (event.getEventType() == JCEvent.EventType.CONFERENCE_MESSAGE_RECEIVED) {
-            JCConfMessageEvent messageEvent = (JCConfMessageEvent)event;
-            Toast.makeText(this, String.format("%s: type:%s content:%s",
-                    messageEvent.fromUserId, messageEvent.type, messageEvent.content), Toast.LENGTH_SHORT).show();
-        }
+
+            @Override
+            public void onNext(HttpResult<List<ConfIng>> listHttpResult) {
+                if(listHttpResult.getResult().size()==0){
+                    Toast.makeText(ConferenceActivity.this, "error", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ConfIng confIng=listHttpResult.getResult().get(0);
+                IdConverter idConverter=new IdConverter(confIng.getMember());
+                adapter.setUidList(idConverter.getList());
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        },"one",channelId);
     }
 
 
-    private void updateControlButtons() {
-        mBtnSendAudio.setSelected(JCManager.getInstance().mediaChannel.getUploadLocalAudio());
-        mBtnSendVideo.setSelected(JCManager.getInstance().mediaChannel.getUploadLocalVideo());
-        mBtnSpeaker.setSelected(JCManager.getInstance().mediaDevice.isSpeakerOn());
-        }
 
 
-    private void switchFullScreen() {
-        Utils.showSystemUI(this, !mFullScreen);
-        Utils.setActivityFullScreen(this, mFullScreen);
-        mControlLayout.setVisibility(mFullScreen ? View.INVISIBLE : View.VISIBLE);
 
-    }
+
 
 
 }

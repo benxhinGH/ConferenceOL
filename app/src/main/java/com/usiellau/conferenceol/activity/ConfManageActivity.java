@@ -23,7 +23,6 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.usiellau.conferenceol.JCWrapper.JCManager;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.adapter.ConfRvAdapter;
 import com.usiellau.conferenceol.network.ConfSvMethods;
@@ -135,6 +134,11 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
 
             @Override
             public void onNext(HttpResult httpResult) {
+                int code=httpResult.getCode();
+                String msg=httpResult.getMsg();
+                if(code!=0){
+                    Log.d("ConfManageActivity","进入房间失败，code："+code+"msg："+msg);
+                }
 
             }
 
@@ -148,19 +152,20 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
             public void onComplete() {
                 closeProgressDialog();
             }
-        },confIng.getRoomId(), PreferenceManager.getDefaultSharedPreferences(ConfManageActivity.this).getString(getString(R.string.cloud_setting_last_login_user_id),""));
-        if(JCManager.getInstance().mediaChannel.join(confIng.getChannelId(),null)){
-            Intent intent=new Intent(this,ConferenceActivity.class);
-            intent.putExtra("roomId",confIng.getRoomId());
-            startActivity(intent);
-        }
-        Toast.makeText(this, "进入房间"+confIng.getRoomId(), Toast.LENGTH_SHORT).show();
+        },confIng.getChannelId(), PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("username",""));
+
+
+        Intent intent=new Intent(this,ConferenceActivity.class);
+        intent.putExtra("channelId",confIng.getChannelId());
+        startActivity(intent);
+
+        Toast.makeText(this, "进入房间"+confIng.getChannelId(), Toast.LENGTH_SHORT).show();
     }
 
 
     private void refreshConfList(){
         Log.d("ConfManageActivity","refreshConfList............");
-        ConfSvMethods.getInstance().queryAllConfIng(new Observer<HttpResult<List<ConfIng>>>() {
+        ConfSvMethods.getInstance().queryConfIng(new Observer<HttpResult<List<ConfIng>>>() {
             @Override
             public void onSubscribe(Disposable d) {
                 refreshLayout.setRefreshing(true);
@@ -190,7 +195,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
             public void onComplete() {
                 refreshLayout.setRefreshing(false);
             }
-        });
+        },"all",null);
     }
 
     private void showProgressDialog(){
