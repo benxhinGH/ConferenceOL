@@ -21,9 +21,6 @@ import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.ConfIng;
 import com.usiellau.conferenceol.util.Utils;
 
-
-import org.greenrobot.eventbus.EventBus;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import dmax.dialog.SpotsDialog;

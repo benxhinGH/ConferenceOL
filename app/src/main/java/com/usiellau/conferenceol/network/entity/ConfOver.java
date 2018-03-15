@@ -12,10 +12,10 @@ public class ConfOver {
     private String title;
     private String creator;
     private Timestamp createTime;
-    private Time duration;
+    private int duration;
     private String participator;
     public ConfOver(int id, String title, String creator, Timestamp createTime,
-                    Time duration, String participator) {
+                    int duration, String participator) {
         this.id = id;
         this.title = title;
         this.creator = creator;
@@ -40,7 +40,7 @@ public class ConfOver {
         return createTime;
     }
 
-    public Time getDuration() {
+    public int getDuration() {
         return duration;
     }
 

@@ -7,8 +7,6 @@
     tools:context=".activity.ConferenceActivity"
     android:id="@+id/contentView">
 
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,76 +21,67 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"/>
     </RelativeLayout>
 
 
     <LinearLayout
         android:id="@+id/controlLayout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:layout_centerHorizontal="true"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
         >
         <Button
             android:id="@+id/btnSwitchCamera"
-            style="@style/JCButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:onClick="onSwitchCamera"
-            android:text="@string/conference_switch_camera" />
+            android:background="@drawable/conf_btn_switch_camera_bg" />
 
         <Button
             android:id="@+id/btnSendAudio"
-            style="@style/JCButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:onClick="onSendAudio"
-            android:text="SendA" />
+            android:background="@drawable/ic_mic_white_24dp" />
 
         <Button
             android:id="@+id/btnSendVideo"
-            style="@style/JCButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:onClick="onSendVideo"
-            android:text="SendV" />
+            android:background="@drawable/ic_videocam_white_24dp" />
         <Button
             android:id="@+id/btnAudioOut"
-            style="@style/JCButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:onClick="onAudioOut"
-            android:text="AudioO" />
+            android:background="@drawable/ic_volume_up_white_24dp" />
 
         <Button
             android:id="@+id/btnSpeaker"
-            style="@style/JCButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:onClick="onSpeaker"
-            android:text="@string/conference_speaker" />
+            android:background="@drawable/ic_speaker_phone_blue_24dp" />
 
          />
     </LinearLayout>
 
     <Button
         android:id="@+id/btnLeave"
-        style="@style/JCButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_margin="8dp"
         android:onClick="onLeave"
-        android:text="@string/conference_leave"/>
+        android:background="@drawable/conf_btn_leave_bg"/>
 
 
 </RelativeLayout>

@@ -65,6 +65,8 @@ public class ConferenceActivity extends AppCompatActivity {
     Button mBtnSendAudio;
     @BindView(R.id.btnSendVideo)
     Button mBtnSendVideo;
+    @BindView(R.id.btnAudioOut)
+    Button mBtnAudioOut;
     @BindView(R.id.partp_list)
     RecyclerView partpList;
     private PartpListAdapter adapter;
@@ -201,6 +203,11 @@ public class ConferenceActivity extends AppCompatActivity {
     public void onSendAudio(View view) {
         mRtcEngine.muteLocalAudioStream(isAudioSend);
         isAudioSend=!isAudioSend;
+        if(isAudioSend){
+            mBtnSendAudio.setBackgroundResource(R.drawable.ic_mic_white_24dp);
+        }else{
+            mBtnSendAudio.setBackgroundResource(R.drawable.ic_mic_off_blue_24dp);
+        }
     }
 
     public void onSendVideo(View view) {
@@ -208,16 +215,33 @@ public class ConferenceActivity extends AppCompatActivity {
         isVideoSend=!isVideoSend;
         SurfaceView surfaceView=(SurfaceView)videoMain.getChildAt(0);
         surfaceView.setVisibility(isVideoSend?View.VISIBLE:View.GONE);
+        if(isVideoSend){
+            mBtnSendVideo.setBackgroundResource(R.drawable.ic_videocam_white_24dp);
+        }else{
+            mBtnSendVideo.setBackgroundResource(R.drawable.ic_videocam_off_blue_24dp);
+        }
+
     }
 
     public void onAudioOut(View view) {
         mRtcEngine.muteAllRemoteAudioStreams(isRemoteAudio);
         isRemoteAudio=!isRemoteAudio;
+        if(isRemoteAudio){
+            mBtnAudioOut.setBackgroundResource(R.drawable.ic_volume_up_white_24dp);
+        }else{
+            mBtnAudioOut.setBackgroundResource(R.drawable.ic_volume_off_blue_24dp);
+        }
     }
 
     public void onSpeaker(View view) {
         mRtcEngine.setEnableSpeakerphone(!isSpeaker);
         isSpeaker=!isSpeaker;
+        if(isSpeaker){
+            mBtnSpeaker.setBackgroundResource(R.drawable.ic_speaker_phone_blue_24dp);
+        }else{
+            mBtnSpeaker.setBackgroundResource(R.drawable.ic_speaker_phone_white_24dp);
+        }
+
     }
 
     public void onLeave(View view) {
