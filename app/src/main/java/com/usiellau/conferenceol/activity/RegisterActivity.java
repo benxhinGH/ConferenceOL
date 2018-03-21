@@ -1,5 +1,6 @@
 package com.usiellau.conferenceol.activity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.Nullable;
@@ -22,7 +23,6 @@ import com.usiellau.conferenceol.util.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import dmax.dialog.SpotsDialog;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -42,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
     @BindView(R.id.et_password)
     EditText etPassword;
 
-    SpotsDialog progressDialog;
+    ProgressDialog progressDialog;
 
 
     @Override
@@ -116,7 +116,8 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void showProgressDialog(){
         if(progressDialog==null){
-            progressDialog=new SpotsDialog(this,R.style.wait_progress_dialog);
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setMessage("请稍候...");
         }
         progressDialog.show();
     }

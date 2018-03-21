@@ -1,11 +1,13 @@
 package com.usiellau.conferenceol.activity;
 
-import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,7 +23,6 @@ import com.usiellau.conferenceol.util.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import dmax.dialog.SpotsDialog;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -40,7 +41,7 @@ public class LoginActivity extends AppCompatActivity{
     @BindView(R.id.btn_login)
     Button btnLogin;
 
-    AlertDialog progressDialog;
+    ProgressDialog progressDialog;
 
 
 
@@ -49,6 +50,7 @@ public class LoginActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+        loginIfLastLogined();
     }
 
 
@@ -99,6 +101,48 @@ public class LoginActivity extends AppCompatActivity{
         },username,password);
     }
 
+    private void loginIfLastLogined(){
+        String username = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("username", null);
+        if (TextUtils.isEmpty(username)) {
+            return;
+        }
+        String password = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString("password", null);
+        ConfSvMethods.getInstance().login(new Observer<HttpResult<User>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult<User> userHttpResult) {
+                int code=userHttpResult.getCode();
+                String msg=userHttpResult.getMsg();
+                if(code==0){
+                    Toast.makeText(LoginActivity.this, "自动登录成功", Toast.LENGTH_SHORT).show();
+                    Intent intent=new Intent(LoginActivity.this,ConfManageActivity.class);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    Toast.makeText(LoginActivity.this, "自动登录失败", Toast.LENGTH_SHORT).show();
+                }
+                Log.d("LoginActivity",userHttpResult.toString());
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(LoginActivity.this, "error", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        },username,password);
+    }
+
     @OnClick(R.id.btn_register)
     public void clickBtnRegister(){
         Intent intent=new Intent(this,RegisterActivity.class);
@@ -107,7 +151,8 @@ public class LoginActivity extends AppCompatActivity{
 
     private void showProgressDialog(){
         if(progressDialog==null){
-            progressDialog=new SpotsDialog(this,R.style.login_progress_dialog);
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setMessage("登陆中...");
         }
         progressDialog.show();
     }

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        >
+        <EditText
+            android:id="@+id/et_conf_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入会议标题"
+            android:maxLines="1"/>
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        >
+        <EditText
+            android:id="@+id/et_conf_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入房间密码"
+            android:maxLines="1"/>
+    </android.support.design.widget.TextInputLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="10dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="请设置房间最大人数"
+            android:textSize="15sp"
+            android:textColor="@color/black"/>
+        <com.gildaswise.horizontalcounter.HorizontalCounter
+            android:id="@+id/capacity_counter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            app:textSize="10sp"
+            app:minusButtonColor="@color/black"
+            app:plusButtonColor="@color/black"
+            app:displayAsInteger="true"
+            app:stepValue="1"
+            app:initialValue="2"
+            app:minValue="2"
+            app:maxValue="5"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_choose_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="+选择文件"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:layout_margin="10dp"
+        android:background="@drawable/tv_choose_file_bg"
+        android:padding="10dp"/>
+
+    <CheckBox
+        android:id="@+id/create_forecast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="创建会议预告" />
+
+    <TextView
+        android:id="@+id/tv_forecast_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:textSize="16sp"
+        android:layout_margin="8dp"/>
+
+
+</LinearLayout>

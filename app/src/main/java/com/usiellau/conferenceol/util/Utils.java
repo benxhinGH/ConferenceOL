@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
@@ -13,10 +14,18 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.usiellau.conferenceol.R;
+import com.usiellau.conferenceol.network.ConfSvMethods;
+import com.usiellau.conferenceol.network.HttpResult;
+import com.usiellau.conferenceol.network.entity.User;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by UsielLau on 2018/1/21 0021 23:30.
@@ -92,6 +101,12 @@ public class Utils {
             }
         }
         return "";
+    }
+
+    public static String longTime2String(long time){
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date d = new Date(time);
+        return sf.format(d);
     }
 
     public static String getUUID(){

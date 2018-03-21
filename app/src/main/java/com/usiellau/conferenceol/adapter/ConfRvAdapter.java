@@ -44,7 +44,7 @@ public class ConfRvAdapter extends RecyclerView.Adapter<ConfRvAdapter.ViewHolder
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.tvConfTitle.setText(confListData.get(position).getTitle());
-
+        holder.tvRoomId.setText("房间号："+String.valueOf(confListData.get(position).getId()));
         if(onItemClickListener!=null){
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

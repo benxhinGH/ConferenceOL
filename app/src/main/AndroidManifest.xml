@@ -34,6 +34,9 @@
         <activity android:name=".activity.ConfManageActivity"/>
         <activity android:name=".activity.CreateConfActivity"/>
         <activity android:name=".activity.ConferenceActivity"/>
+        <activity android:name=".activity.CreateSpeechActivity"/>
+        <activity android:name=".activity.SpeechActivity"/>
+        <activity android:name=".activity.ForecastActivity"/>
     </application>
 
 

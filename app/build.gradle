@@ -31,11 +31,13 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    compile 'com.github.d-max:spots-dialog:0.7@aar'
     compile 'com.android.support:design:26.1.0'
     compile 'com.github.gildaswise:HorizontalCounter:1.0.6.1'
     compile 'com.balysv:material-ripple:1.0.2'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
+    compile 'com.getbase:floatingactionbutton:1.10.1'
+    compile 'com.droidninja:filepicker:2.1.2'
+    compile 'com.jzxiang.pickerview:TimePickerDialog:1.0.1'
 
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'

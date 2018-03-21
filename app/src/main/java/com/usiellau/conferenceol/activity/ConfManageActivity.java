@@ -1,5 +1,6 @@
 package com.usiellau.conferenceol.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -17,12 +18,18 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.adapter.ConfRvAdapter;
 import com.usiellau.conferenceol.network.ConfSvMethods;
@@ -32,8 +39,9 @@ import com.usiellau.conferenceol.network.entity.ConfIng;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import dmax.dialog.SpotsDialog;
+import butterknife.OnClick;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -48,10 +56,18 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
     NavigationView navigationView;
     RecyclerView rvConfList;
     SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.create_conf_menu)
+    FloatingActionsMenu createConfMenu;
+    @BindView(R.id.video_conf)
+    FloatingActionButton videoConfBtn;
+    @BindView(R.id.speech_conf)
+    FloatingActionButton speechConfBtn;
 
-    SpotsDialog progressDialog;
+    ProgressDialog progressDialog;
 
     ConfRvAdapter confListAdapter;
+
+    Runnable drawerClosedRunnable;
 
 
     @Override
@@ -86,7 +102,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         confListAdapter.setOnItemClickListener(new ConfRvAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-                showPwdInputDialog(position);
+                showConfDetailsDialog(position);
             }
         });
 
@@ -99,22 +115,66 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
                 refreshConfList();
             }
         });
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                if(drawerClosedRunnable!=null){
+                    drawerClosedRunnable.run();
+                    drawerClosedRunnable=null;
+                }
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
 
     }
 
+    private void showConfDetailsDialog(final int position){
+        View dialogView= LayoutInflater.from(this).inflate(R.layout.dialog_conf_details,null);
+        TextView tvConfTitle=dialogView.findViewById(R.id.tv_conf_title);
+        TextView tvConfType=dialogView.findViewById(R.id.tv_conf_type);
+        TextView tvCapacity=dialogView.findViewById(R.id.tv_capacity);
+        TextView tvCreator=dialogView.findViewById(R.id.tv_creator);
+        TextView tvStartTime=dialogView.findViewById(R.id.tv_start_time);
+        final EditText etPassword=dialogView.findViewById(R.id.et_password);
+        ConfIng confIng=confListAdapter.getData().get(position);
+        tvConfTitle.setText(confIng.getTitle());
+        if(confIng.getType()==0)tvConfType.setText("视频会议");
+        else if(confIng.getType()==1)tvConfType.setText("演示会议");
+        tvCapacity.setText(String.valueOf(confIng.getCapacity()));
+        tvCreator.setText(confIng.getCreator());
+        tvStartTime.setText(confIng.getCreateTime().toString());
 
-    private void showPwdInputDialog(final int position){
         MaterialDialog dialog=new MaterialDialog.Builder(this)
-                .input("请输入房间密码", null, new MaterialDialog.InputCallback() {
+                .title("会议信息")
+                .customView(dialogView,true)
+                .positiveText("进入会议")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
-                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                        attemptEnterRoom(position,input.toString());
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        String password=etPassword.getText().toString();
+                        attemptEnterRoom(position,password);
                     }
                 })
-                .inputType(InputType.TYPE_TEXT_VARIATION_PASSWORD)
-                .title("提示")
-                .show();
+                .negativeText("取消")
+                .build();
+        dialog.show();
+
     }
+
 
     private void attemptEnterRoom(int position,String pwd){
         ConfIng conf=confListAdapter.getData().get(position);
@@ -200,7 +260,8 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
 
     private void showProgressDialog(){
         if(progressDialog==null){
-            progressDialog=new SpotsDialog(this,R.style.login_progress_dialog);
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setMessage("请稍候...");
         }
         progressDialog.show();
     }
@@ -236,9 +297,8 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.action_create_conf:
-                Intent intent=new Intent(this,CreateConfActivity.class);
-                startActivity(intent);
+            case R.id.action_search_conf:
+                Toast.makeText(this, "searchconf", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -254,9 +314,24 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
      */
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
+
         switch (item.getItemId()){
             case R.id.nav_personal:
                 Toast.makeText(this, "personal", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_conf_forecast:
+                Toast.makeText(this, "forecast", Toast.LENGTH_SHORT).show();
+                drawerClosedRunnable=new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent intent=new Intent(ConfManageActivity.this,ForecastActivity.class);
+                        startActivity(intent);
+                    }
+                };
+                break;
+            case R.id.nav_conf_record:
+                Toast.makeText(this, "record", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_setting:
                 Toast.makeText(this, "setting", Toast.LENGTH_SHORT).show();
@@ -267,8 +342,25 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
             default:
                 break;
         }
-
         drawer.closeDrawer(GravityCompat.START);
+
         return true;
+    }
+
+    @OnClick(R.id.video_conf)
+    public void onClickVideoConf(){
+        Intent intent=new Intent(this,CreateConfActivity.class);
+        startActivity(intent);
+        createConfMenu.toggle();
+    }
+    @OnClick(R.id.speech_conf)
+    public void onClickSpeechConf(){
+        Intent intent=new Intent(this,CreateSpeechActivity.class);
+        startActivity(intent);
+        createConfMenu.toggle();
+    }
+
+    class RunnableHolder{
+        Runnable runnable;
     }
 }

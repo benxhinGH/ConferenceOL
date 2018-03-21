@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 public class ConfIng {
     private int id;
     private String title;
+    private int type;
     private String password;
     private String channelId;
     private int capacity;
@@ -22,10 +23,11 @@ public class ConfIng {
 
     }
 
-    public ConfIng(int id, String title, String password, String channelId, int capacity,
+    public ConfIng(int id, String title, int type, String password, String channelId, int capacity,
                    int online, String member, String creator, Timestamp createTime, String participator) {
         this.id = id;
         this.title = title;
+        this.type=type;
         this.password = password;
         this.channelId = channelId;
         this.capacity = capacity;
@@ -34,6 +36,14 @@ public class ConfIng {
         this.creator = creator;
         this.createTime = createTime;
         this.participator = participator;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getOnline() {

@@ -1,8 +1,8 @@
 package com.usiellau.conferenceol.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +23,6 @@ import com.usiellau.conferenceol.util.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import dmax.dialog.SpotsDialog;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -44,9 +43,7 @@ public class CreateConfActivity extends AppCompatActivity {
     @BindView(R.id.capacity_counter)
     HorizontalCounter counter;
 
-    SpotsDialog progressDialog;
-
-    Handler handler=new Handler();
+    ProgressDialog progressDialog;
 
 
     @Override
@@ -127,7 +124,7 @@ public class CreateConfActivity extends AppCompatActivity {
             public void onComplete() {
                 closeProgressDialog();
             }
-        },title,password,channelId,capacity,creator);
+        },title,0,password,channelId,capacity,creator,false);
     }
 
 
@@ -173,7 +170,8 @@ public class CreateConfActivity extends AppCompatActivity {
 
     private void showProgressDialog(){
         if(progressDialog==null){
-            progressDialog=new SpotsDialog(this,R.style.wait_progress_dialog);
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setMessage("请稍候...");
         }
         progressDialog.show();
     }

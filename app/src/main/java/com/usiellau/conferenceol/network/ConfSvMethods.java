@@ -2,17 +2,22 @@ package com.usiellau.conferenceol.network;
 
 import android.util.Log;
 
+import com.usiellau.conferenceol.network.entity.ConfForecast;
 import com.usiellau.conferenceol.network.entity.ConfIng;
 import com.usiellau.conferenceol.network.entity.ConfOver;
 import com.usiellau.conferenceol.network.entity.User;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -26,8 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfSvMethods {
 
-    public static final String BASE_URL="http://192.168.1.101:8080/ConfOL/";
-
+    public static final String BASE_URL="http://192.168.155.1:8080/ConfOL/";
     private static final int DEFAULT_TIMEOUT=5;
 
     private Retrofit retrofit;
@@ -101,9 +105,9 @@ public class ConfSvMethods {
     }
 
     public void createConference(Observer<HttpResult<ConfIng>> observer,
-                                 String title,String password,
-                                 String channelId,int capacity,String creator){
-        confSvApi.createConference(title, password,channelId, capacity, creator)
+                                 String title,int type,String password,
+                                 String channelId,int capacity,String creator,boolean hasfile){
+        confSvApi.createConference(title, type,password,channelId, capacity, creator,hasfile)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -120,6 +124,38 @@ public class ConfSvMethods {
 
     public void leaveRoom(Observer<HttpResult> observer,String roomId,String phonenumber){
         confSvApi.leaveRoom(roomId, phonenumber)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void uploadFile(Observer<HttpResult> observer,String description, File file){
+        RequestBody requestFile =
+                RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+
+        RequestBody description1 =
+                RequestBody.create(MediaType.parse("multipart/form-data"),description);
+        confSvApi.uploadFile(description1,body)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void createForecast(Observer<HttpResult> observer,String title,String password,String channelId,
+                               int capacity,String creator,boolean hasFile,long startTime){
+        confSvApi.createForecast(title,password,channelId,capacity,creator,hasFile,startTime)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void queryForecast(Observer<HttpResult<List<ConfForecast>>> observer){
+        confSvApi.queryForecast()
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

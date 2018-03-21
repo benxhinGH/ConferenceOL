@@ -3,11 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".activity.ConfManageActivity">
+    tools:context=".activity.CreateSpeechActivity">
     <item
-        android:id="@+id/action_search_conf"
-        android:title="查询会议"
-        android:icon="@drawable/ic_search_white_24dp"
+        android:id="@+id/action_submit"
+        android:title="完成"
+        android:icon="@drawable/ic_done_white_24dp"
         android:orderInCategory="100"
         app:showAsAction="ifRoom"/>
+
 </menu>
