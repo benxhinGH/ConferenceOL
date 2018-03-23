@@ -7,13 +7,16 @@
         android:title="个人信息" />
     <item
         android:id="@+id/nav_conf_forecast"
-        android:icon="@drawable/ic_person_black_24dp"
+        android:icon="@drawable/ic_alarm_black_24dp"
         android:title="会议预告"/>
     <item
         android:id="@+id/nav_conf_record"
-        android:icon="@drawable/ic_person_black_24dp"
+        android:icon="@drawable/ic_assignment_black_24dp"
         android:title="会议记录"/>
-
+    <item
+        android:id="@+id/nav_conf_file"
+        android:icon="@drawable/ic_folder_open_black_24dp"
+        android:title="我的文件"/>
     <item
         android:id="@+id/nav_setting"
         android:icon="@drawable/ic_settings_applications_black_24dp"

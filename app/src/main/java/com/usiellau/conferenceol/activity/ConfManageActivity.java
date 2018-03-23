@@ -145,21 +145,32 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
     private void showConfDetailsDialog(final int position){
         View dialogView= LayoutInflater.from(this).inflate(R.layout.dialog_conf_details,null);
         TextView tvConfTitle=dialogView.findViewById(R.id.tv_conf_title);
-        TextView tvConfType=dialogView.findViewById(R.id.tv_conf_type);
         TextView tvCapacity=dialogView.findViewById(R.id.tv_capacity);
         TextView tvCreator=dialogView.findViewById(R.id.tv_creator);
+        TextView hasfileTv=dialogView.findViewById(R.id.hasfile_tv);
+        TextView tvHasFile=dialogView.findViewById(R.id.tv_hasfile);
         TextView tvStartTime=dialogView.findViewById(R.id.tv_start_time);
         final EditText etPassword=dialogView.findViewById(R.id.et_password);
         ConfIng confIng=confListAdapter.getData().get(position);
+        String title="";
+        int iconId=0;
         tvConfTitle.setText(confIng.getTitle());
-        if(confIng.getType()==0)tvConfType.setText("视频会议");
-        else if(confIng.getType()==1)tvConfType.setText("演示会议");
+        if(confIng.getType()==0){
+            title="视频会议";
+            iconId=R.drawable.ic_group_black_24dp;
+            hasfileTv.setVisibility(View.GONE);
+            tvHasFile.setVisibility(View.GONE);
+        } else if(confIng.getType()==1){
+            title="演示会议";
+            iconId=R.drawable.ic_ondemand_video_black_24dp;
+        }
         tvCapacity.setText(String.valueOf(confIng.getCapacity()));
         tvCreator.setText(confIng.getCreator());
         tvStartTime.setText(confIng.getCreateTime().toString());
 
         MaterialDialog dialog=new MaterialDialog.Builder(this)
-                .title("会议信息")
+                .title(title)
+                .iconRes(iconId)
                 .customView(dialogView,true)
                 .positiveText("进入会议")
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -322,16 +333,13 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
                 break;
             case R.id.nav_conf_forecast:
                 Toast.makeText(this, "forecast", Toast.LENGTH_SHORT).show();
-                drawerClosedRunnable=new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent=new Intent(ConfManageActivity.this,ForecastActivity.class);
-                        startActivity(intent);
-                    }
-                };
+                startActivity(ForecastActivity.class);
                 break;
             case R.id.nav_conf_record:
                 Toast.makeText(this, "record", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.nav_conf_file:
+                startActivity(FileManageActivity.class);
                 break;
             case R.id.nav_setting:
                 Toast.makeText(this, "setting", Toast.LENGTH_SHORT).show();
@@ -360,7 +368,16 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         createConfMenu.toggle();
     }
 
-    class RunnableHolder{
-        Runnable runnable;
+    private void startActivity(final Class cls){
+        drawerClosedRunnable=new Runnable() {
+            @Override
+            public void run() {
+                Intent intent=new Intent(ConfManageActivity.this,cls);
+                startActivity(intent);
+            }
+        };
+
     }
+
+
 }

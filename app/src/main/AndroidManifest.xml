@@ -37,6 +37,8 @@
         <activity android:name=".activity.CreateSpeechActivity"/>
         <activity android:name=".activity.SpeechActivity"/>
         <activity android:name=".activity.ForecastActivity"/>
+        <activity android:name=".activity.FileManageActivity"/>
+        <activity android:name=".activity.PdfViewActivity"/>
     </application>
 
 

@@ -33,6 +33,7 @@ import butterknife.ButterKnife;
 import io.agora.rtc.Constants;
 import io.agora.rtc.IRtcEngineEventHandler;
 import io.agora.rtc.RtcEngine;
+import io.agora.rtc.mediaio.IVideoSource;
 import io.agora.rtc.video.VideoCanvas;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
@@ -132,6 +133,7 @@ public class ConferenceActivity extends AppCompatActivity {
         partpList.setLayoutManager(new LinearLayoutManager(this));
         adapter=new PartpListAdapter(this,mRtcEngine);
         partpList.setAdapter(adapter);
+
     }
 
     @Override

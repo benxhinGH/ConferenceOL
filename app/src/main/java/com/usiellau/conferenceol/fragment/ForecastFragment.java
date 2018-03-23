@@ -1,5 +1,6 @@
 package com.usiellau.conferenceol.fragment;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +23,11 @@ import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.adapter.ForecastListAdapter;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
+import com.usiellau.conferenceol.network.entity.ConfFile;
 import com.usiellau.conferenceol.network.entity.ConfForecast;
 import com.usiellau.conferenceol.util.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +46,8 @@ public class ForecastFragment extends Fragment {
     RecyclerView recyclerView;
     @BindView(R.id.refresh_layout)
     SwipeRefreshLayout refreshLayout;
+
+    ProgressDialog progressDialog;
 
     boolean isMyForecast;
 
@@ -76,7 +82,7 @@ public class ForecastFragment extends Fragment {
         return rootView;
     }
 
-    private void showForecastDetailsDialog(ConfForecast forecast){
+    private void showForecastDetailsDialog(final ConfForecast forecast){
         View dialogView=LayoutInflater.from(getActivity()).inflate(R.layout.dialog_forecast_details,null);
         TextView tvConfTitle=dialogView.findViewById(R.id.tv_conf_title);
         TextView tvCapacity=dialogView.findViewById(R.id.tv_capacity);
@@ -97,7 +103,7 @@ public class ForecastFragment extends Fragment {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        Toast.makeText(getActivity(), "download file", Toast.LENGTH_SHORT).show();
+                        onClickDownload(forecast);
                     }
                 })
                 .negativeText("OK")
@@ -106,7 +112,65 @@ public class ForecastFragment extends Fragment {
         dialog.show();
     }
 
+    private void onClickDownload(ConfForecast forecast){
+        ConfSvMethods.getInstance().queryConfFile(new Observer<HttpResult<ConfFile>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
+            }
+
+            @Override
+            public void onNext(HttpResult<ConfFile> confFileHttpResult) {
+                Log.d("ForecastFragment","文件查询成功，要下载的文件信息如下："+confFileHttpResult.getResult().toString());
+                downloadConfFile(confFileHttpResult.getResult());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(getActivity(), "error", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        },forecast.getChannelId());
+    }
+
+    private void downloadConfFile(ConfFile confFile){
+        ConfSvMethods.getInstance().downloadConfFile(new Observer<Boolean>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                showProgressDialog();
+            }
+
+            @Override
+            public void onNext(Boolean aBoolean) {
+                if(aBoolean){
+                    Toast.makeText(getActivity(), "文件下载成功", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getActivity(), "文件下载失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(getActivity(), "error", Toast.LENGTH_SHORT).show();
+                closeProgressDialog();
+            }
+
+            @Override
+            public void onComplete() {
+                closeProgressDialog();
+            }
+        },confFile.getPath(),getFileSavePath(confFile.getName()));
+    }
+
+    private String getFileSavePath(String fileName){
+        String res=getActivity().getExternalFilesDir(null)+ File.separator+fileName;
+        Log.d("ForecastFragment","文件存储路径为："+res);
+        return res;
+    }
 
     private void refreshList(){
         ConfSvMethods.getInstance().queryForecast(new Observer<HttpResult<List<ConfForecast>>>() {
@@ -154,6 +218,18 @@ public class ForecastFragment extends Fragment {
             }
         }
         return res;
+    }
+
+    private void showProgressDialog(){
+        if(progressDialog==null){
+            progressDialog=new ProgressDialog(getActivity());
+            progressDialog.setMessage("下载文件中...");
+        }
+        progressDialog.show();
+    }
+
+    private void closeProgressDialog(){
+        progressDialog.cancel();
     }
 
 

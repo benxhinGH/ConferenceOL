@@ -2,22 +2,29 @@ package com.usiellau.conferenceol.network;
 
 import android.util.Log;
 
+import com.usiellau.conferenceol.network.entity.ConfFile;
 import com.usiellau.conferenceol.network.entity.ConfForecast;
 import com.usiellau.conferenceol.network.entity.ConfIng;
 import com.usiellau.conferenceol.network.entity.ConfOver;
 import com.usiellau.conferenceol.network.entity.User;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -31,7 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfSvMethods {
 
-    public static final String BASE_URL="http://192.168.155.1:8080/ConfOL/";
+    public static final String BASE_URL="http://192.168.1.101:8080/ConfOL/";
     private static final int DEFAULT_TIMEOUT=5;
 
     private Retrofit retrofit;
@@ -161,6 +168,79 @@ public class ConfSvMethods {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
+
+    public void downloadConfFile(Observer<Boolean> observer, String serverPath, final String localPath){
+        confSvApi.downloadConfFile(serverPath)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(new Function<ResponseBody, Boolean>() {
+                    @Override
+                    public Boolean apply(ResponseBody responseBody) throws Exception {
+                        return writeResponseBodyToDisk(responseBody,localPath);
+                    }
+                })
+                .subscribe(observer);
+    }
+
+    public void queryConfFile(Observer<HttpResult<ConfFile>> observer,String channelId){
+        confSvApi.queryConfFile(channelId)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+    private boolean writeResponseBodyToDisk(ResponseBody body,String path) {
+        try {
+            // todo change the file location/name according to your needs
+            File file = new File(path);
+
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+
+            try {
+                byte[] fileReader = new byte[4096];
+
+                long fileSize = body.contentLength();
+                long fileSizeDownloaded = 0;
+
+                inputStream = body.byteStream();
+                outputStream = new FileOutputStream(file);
+
+                while (true) {
+                    int read = inputStream.read(fileReader);
+
+                    if (read == -1) {
+                        break;
+                    }
+
+                    outputStream.write(fileReader, 0, read);
+
+                    fileSizeDownloaded += read;
+
+                    Log.d("ConfSvMethods", "file download: " + fileSizeDownloaded + " of " + fileSize);
+                }
+
+                outputStream.flush();
+
+                return true;
+            } catch (IOException e) {
+                return false;
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            }
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+
 
 
 

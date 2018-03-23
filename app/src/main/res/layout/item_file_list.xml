@@ -10,24 +10,17 @@
     app:mrl_rippleDelayClick="false"
     android:padding="10dp">
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/tv_file_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/tv_conf_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="20sp"
-            android:text="会议名称"/>
-        <TextView
-            android:id="@+id/tv_room_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:textSize="15sp"
-            android:text="房间号"/>
+        android:text="文件名称"
+        android:textColor="@color/black"
+        android:textSize="20sp"/>
+
     </LinearLayout>
-
-
 </com.balysv.materialripple.MaterialRippleLayout>
