@@ -18,6 +18,11 @@ import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.User;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
@@ -42,11 +47,44 @@ public class Utils {
                 .apply();
     }
 
+    public static String getDefaultFileSavePath(Context context){
+        return context.getExternalFilesDir(null).getPath();
+    }
+
+    public static boolean copySdcardFile(String fromFile, String toFile) {
+
+        try {
+            InputStream fosfrom = new FileInputStream(fromFile);
+            OutputStream fosto = new FileOutputStream(toFile);
+            byte bt[] = new byte[1024];
+            int c;
+            while ((c = fosfrom.read(bt)) > 0) {
+                fosto.write(bt, 0, c);
+            }
+            fosfrom.close();
+            fosto.close();
+            return true;
+
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
     public static boolean isMobiPhoneNum(String telNum){
         String regex = "^((13[0-9])|(15[0-9])|(18[0-9]))\\d{8}$";
         Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(telNum);
         return m.matches();
+    }
+
+    public static boolean fileExistExternalDir(Context context,String fileName){
+        File[] files=context.getExternalFilesDir(null).listFiles();
+        for(File file:files){
+            if(file.getName().equals(fileName)){
+                return true;
+            }
+        }
+        return false;
     }
 
 

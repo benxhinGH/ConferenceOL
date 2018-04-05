@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +48,8 @@ import io.reactivex.disposables.Disposable;
  */
 
 public class CreateSpeechActivity extends AppCompatActivity implements OnDateSetListener{
+
+    String TAG=CreateSpeechActivity.class.getSimpleName();
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -150,20 +153,30 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
     }
 
     private void onSubmit(){
-        String channelId= Utils.getUUID();
-        boolean hasFile=fileSelected!=null;
+        final String channelId= Utils.getUUID();
+        final boolean hasFile=fileSelected!=null;
+        Runnable afterWork=new Runnable() {
+            @Override
+            public void run() {
+                if(cbCreateForecast.isChecked()){
+                    createForecast(channelId,hasFile);
+                }else{
+                    createSpeech(channelId,hasFile);
+                }
+
+            }
+        };
+
         if(hasFile){
-            uploadFile(channelId);
-        }
-        if(cbCreateForecast.isChecked()){
-            createForecast(channelId,hasFile);
+            uploadFile(channelId,afterWork);
         }else{
-            createSpeech(channelId,hasFile);
+            afterWork.run();
         }
+
 
     }
 
-    private void createSpeech(String channelId,boolean hasFile){
+    private void createSpeech(final String channelId, final boolean hasFile){
         String title=etConfTitle.getText().toString();
         String password=etConfPassword.getText().toString();
         int type=1;
@@ -181,7 +194,14 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
                 String msg=confIngHttpResult.getMsg();
                 if(code==0){
                     Toast.makeText(CreateSpeechActivity.this, "创建speech成功", Toast.LENGTH_SHORT).show();
+                    if(hasFile&&!Utils.fileExistExternalDir(CreateSpeechActivity.this,fileSelected.getName())){
+                        String sp=fileSelected.getAbsolutePath();
+                        String dp=Utils.getDefaultFileSavePath(CreateSpeechActivity.this)+File.separator+fileSelected.getName();
+                        Utils.copySdcardFile(sp,dp);
+                        Log.d(TAG,"复制文件，原路径："+sp+"目的路径："+dp);
+                    }
                     Intent intent=new Intent(CreateSpeechActivity.this,SpeechActivity.class);
+                    intent.putExtra("channelId",channelId);
                     startActivity(intent);
                     finish();
                 }else{
@@ -203,7 +223,7 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
         },title,type,password,channelId,capacity,creator,hasFile);
     }
 
-    private void uploadFile(String channelId){
+    private void uploadFile(String channelId, final Runnable afterWork){
         ConfSvMethods.getInstance().uploadFile(new Observer<HttpResult>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -216,6 +236,7 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
                 String msg=httpResult.getMsg();
                 if(code==0){
                     Toast.makeText(CreateSpeechActivity.this, "上传文件成功", Toast.LENGTH_SHORT).show();
+                    afterWork.run();
                 }else{
                     Toast.makeText(CreateSpeechActivity.this, "上传文件失败", Toast.LENGTH_SHORT).show();
                 }

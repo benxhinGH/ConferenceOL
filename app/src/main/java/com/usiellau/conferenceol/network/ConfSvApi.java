@@ -4,6 +4,7 @@ import com.usiellau.conferenceol.network.entity.ConfFile;
 import com.usiellau.conferenceol.network.entity.ConfForecast;
 import com.usiellau.conferenceol.network.entity.ConfIng;
 import com.usiellau.conferenceol.network.entity.ConfOver;
+import com.usiellau.conferenceol.network.entity.PdfSyn;
 import com.usiellau.conferenceol.network.entity.User;
 
 
@@ -86,6 +87,10 @@ public interface ConfSvApi {
     @FormUrlEncoded
     @POST("download")
     Observable<ResponseBody> downloadConfFile(@Field("path") String path);
+
+    @FormUrlEncoded
+    @POST("pdf_syn")
+    Observable<HttpResult> sendPdfSyn(@Field("pdf_syn")PdfSyn pdfSyn);
 
 
 }

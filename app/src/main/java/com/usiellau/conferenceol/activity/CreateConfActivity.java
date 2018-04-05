@@ -118,6 +118,7 @@ public class CreateConfActivity extends AppCompatActivity {
             public void onError(Throwable e) {
                 closeProgressDialog();
                 Toast.makeText(CreateConfActivity.this, "error", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
 
             @Override

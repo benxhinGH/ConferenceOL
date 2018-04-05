@@ -25,12 +25,11 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-
     compile 'com.android.support:design:26.1.0'
     compile 'com.github.gildaswise:HorizontalCounter:1.0.6.1'
     compile 'com.balysv:material-ripple:1.0.2'
@@ -39,8 +38,6 @@ dependencies {
     compile 'com.droidninja:filepicker:2.1.2'
     compile 'com.jzxiang.pickerview:TimePickerDialog:1.0.1'
     compile 'jp.wasabeef:recyclerview-animators:2.3.0'
-
-    compile 'com.github.barteksc:android-pdf-viewer:3.0.0-beta.5'
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
@@ -50,5 +47,5 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'io.agora.rtc:full-sdk:2.1.0'
-
+    implementation project(':android-pdf-viewer')
 }

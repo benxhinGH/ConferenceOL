@@ -3,8 +3,11 @@ package com.usiellau.conferenceol.activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
+
 
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.usiellau.conferenceol.R;
 
 import java.io.File;
@@ -20,6 +23,8 @@ public class PdfViewActivity extends AppCompatActivity {
 
     @BindView(R.id.pdfview)
     PDFView pdfView;
+
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,5 +45,8 @@ public class PdfViewActivity extends AppCompatActivity {
                 .defaultPage(0)
                 .spacing(10) // in dp
                 .load();
+
+
+
     }
 }
