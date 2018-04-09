@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
@@ -14,12 +15,17 @@ import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.ConfFile;
+import com.usiellau.conferenceol.tcp.ConnectionClient;
+import com.usiellau.conferenceol.tcp.callback.RequestCallBack;
+import com.usiellau.conferenceol.tcp.protocol.BasicProtocol;
+import com.usiellau.conferenceol.tcp.protocol.DataProtocol;
 import com.usiellau.conferenceol.util.Utils;
 
 import java.io.File;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -29,8 +35,26 @@ import io.reactivex.disposables.Disposable;
 
 public class SpeechActivity extends AppCompatActivity {
 
+    String TAG=SpeechActivity.class.getSimpleName();
+
     @BindView(R.id.pdfview)
     PDFView pdfView;
+    @BindView(R.id.btn_test)
+    Button testBtn;
+
+    ConnectionClient client;
+
+    RequestCallBack clientCallback=new RequestCallBack() {
+        @Override
+        public void onSuccess(BasicProtocol msg) {
+            Log.d(TAG,"onSuccess,"+msg);
+        }
+
+        @Override
+        public void onFailed(int errorCode, String msg) {
+            Log.d(TAG,"onFailed,errorCode:"+errorCode+",msg:"+msg);
+        }
+    };
 
     String fileName;
 
@@ -102,7 +126,40 @@ public class SpeechActivity extends AppCompatActivity {
             }
         },channelId);
 
+        requestTcpLongCon();
+    }
 
+    private void requestTcpLongCon(){
+        Log.d(TAG,"请求建立tcp长连接");
+        ConfSvMethods.getInstance().requestTcpLongConnection(new Observer<HttpResult>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult httpResult) {
+                int code=httpResult.getCode();
+                if(code==0){
+                    buildTcpLongConnection();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(SpeechActivity.this, "error", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+    }
+
+    private void buildTcpLongConnection(){
+        Log.d(TAG,"建立tcp长连接");
+        client=new ConnectionClient(clientCallback);
     }
 
     private void startSpeech(){
@@ -134,6 +191,19 @@ public class SpeechActivity extends AppCompatActivity {
                 .load();
     }
 
+    @OnClick(R.id.btn_test)
+    public void onClickTest(){
+        DataProtocol data=new DataProtocol();
+        data.setData("hi,imclient");
+        client.addNewRequest(data);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        client.closeConnect();
+    }
 
     private void showProgressDialog(){
         if(progressDialog==null){

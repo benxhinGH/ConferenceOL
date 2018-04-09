@@ -190,6 +190,14 @@ public class ConfSvMethods {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
+
+    public void requestTcpLongConnection(Observer<HttpResult> observer){
+        confSvApi.requestTcpLongCon()
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
     private boolean writeResponseBodyToDisk(ResponseBody body,String path) {
         try {
             // todo change the file location/name according to your needs

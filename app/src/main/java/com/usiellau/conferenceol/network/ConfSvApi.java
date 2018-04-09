@@ -92,5 +92,8 @@ public interface ConfSvApi {
     @POST("pdf_syn")
     Observable<HttpResult> sendPdfSyn(@Field("pdf_syn")PdfSyn pdfSyn);
 
+    @POST("tcp")
+    Observable<HttpResult> requestTcpLongCon();
+
 
 }
