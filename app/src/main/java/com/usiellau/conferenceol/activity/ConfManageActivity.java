@@ -226,8 +226,13 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         },confIng.getChannelId(), PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getString("username",""));
 
 
+
         Intent intent=new Intent(this,ConferenceActivity.class);
         intent.putExtra("channelId",confIng.getChannelId());
+        if(confIng.getType()==1){
+            intent.putExtra("identity",1);
+            intent.putExtra("roomId",confIng.getId());
+        }
         startActivity(intent);
 
         Toast.makeText(this, "进入房间"+confIng.getChannelId(), Toast.LENGTH_SHORT).show();

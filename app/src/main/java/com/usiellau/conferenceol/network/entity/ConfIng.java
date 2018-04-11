@@ -9,6 +9,9 @@ import java.sql.Timestamp;
 public class ConfIng {
     private int id;
     private String title;
+    /**
+     * 0为视频会议，1为演示会议
+     */
     private int type;
     private String password;
     private String channelId;

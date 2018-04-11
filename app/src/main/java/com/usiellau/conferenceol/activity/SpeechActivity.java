@@ -2,22 +2,31 @@ package com.usiellau.conferenceol.activity;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.github.barteksc.pdfviewer.listener.OnZoomListener;
+import com.google.gson.Gson;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.ConfFile;
 import com.usiellau.conferenceol.tcp.ConnectionClient;
 import com.usiellau.conferenceol.tcp.callback.RequestCallBack;
+import com.usiellau.conferenceol.tcp.event.AuthEvent;
+import com.usiellau.conferenceol.tcp.event.ScrollEvent;
+import com.usiellau.conferenceol.tcp.event.ZoomEvent;
 import com.usiellau.conferenceol.tcp.protocol.BasicProtocol;
+import com.usiellau.conferenceol.tcp.protocol.DataAckProtocol;
 import com.usiellau.conferenceol.tcp.protocol.DataProtocol;
 import com.usiellau.conferenceol.util.Utils;
 
@@ -39,14 +48,36 @@ public class SpeechActivity extends AppCompatActivity {
 
     @BindView(R.id.pdfview)
     PDFView pdfView;
-    @BindView(R.id.btn_test)
-    Button testBtn;
+
+
+    Gson gson=new Gson();
 
     ConnectionClient client;
 
     RequestCallBack clientCallback=new RequestCallBack() {
         @Override
         public void onSuccess(BasicProtocol msg) {
+            if(msg.getProtocolType()==1){
+                DataAckProtocol dataAck=(DataAckProtocol)msg;
+                if(dataAck.getUnused().equals(AuthEvent.AUTH_SUCCESS)){
+                    prepareConfFile(channelId);
+                }
+            }else if(msg.getProtocolType()==0){
+                DataProtocol data=(DataProtocol)msg;
+                switch (data.getPattion()){
+                    case ScrollEvent.EVENTTYPE:
+                        ScrollEvent scrollEvent=gson.fromJson(data.getData(),ScrollEvent.class);
+                        Log.d(TAG,"收到scroll事件:"+scrollEvent.toString());
+                        break;
+                    case ZoomEvent.EVENTTYPE:
+                        ZoomEvent zoomEvent=gson.fromJson(data.getData(),ZoomEvent.class);
+                        pdfView.zoomWithAnimation(zoomEvent.getCenterX(),zoomEvent.getCenterY(),zoomEvent.getScale());
+                        Log.d(TAG,"收到zoom事件:"+zoomEvent.toString());
+                        break;
+                        default:
+                            break;
+                }
+            }
             Log.d(TAG,"onSuccess,"+msg);
         }
 
@@ -58,6 +89,9 @@ public class SpeechActivity extends AppCompatActivity {
 
     String fileName;
 
+    String channelId;
+    int identity;
+    int roomId;
 
     ProgressDialog progressDialog;
 
@@ -66,9 +100,14 @@ public class SpeechActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speech);
         ButterKnife.bind(this);
+        channelId=getIntent().getStringExtra("channelId");
+        identity=getIntent().getIntExtra("identity",-1);
+        roomId=getIntent().getIntExtra("roomId",-1);
 
-        String channelId=getIntent().getStringExtra("channelId");
+        requestTcpLongCon();
+    }
 
+    private void prepareConfFile(String channelId){
         ConfSvMethods.getInstance().queryConfFile(new Observer<HttpResult<ConfFile>>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -125,8 +164,6 @@ public class SpeechActivity extends AppCompatActivity {
                 closeProgressDialog();
             }
         },channelId);
-
-        requestTcpLongCon();
     }
 
     private void requestTcpLongCon(){
@@ -142,6 +179,7 @@ public class SpeechActivity extends AppCompatActivity {
                 int code=httpResult.getCode();
                 if(code==0){
                     buildTcpLongConnection();
+                    identityAuth();
                 }
             }
 
@@ -162,6 +200,14 @@ public class SpeechActivity extends AppCompatActivity {
         client=new ConnectionClient(clientCallback);
     }
 
+    private void identityAuth(){
+        AuthEvent authEvent=new AuthEvent(roomId,identity);
+        DataProtocol dataProtocol=new DataProtocol();
+        dataProtocol.setPattion(0);
+        dataProtocol.setData(gson.toJson(authEvent,AuthEvent.class));
+        client.addNewRequest(dataProtocol);
+    }
+
     private void startSpeech(){
         Log.d("SpeechActivity","开始会议");
         File[] files=getExternalFilesDir(null).listFiles();
@@ -178,25 +224,29 @@ public class SpeechActivity extends AppCompatActivity {
                 .onPageScroll(new OnPageScrollListener() {
                     @Override
                     public void onPageScrolled(int page, float positionOffset) {
-                        Log.d("SpeechActivity","OnScroll事件：page:"+page+",positionOffset:"+positionOffset);
+                        ScrollEvent event=new ScrollEvent(page,positionOffset);
+                        DataProtocol dataProtocol=new DataProtocol();
+                        dataProtocol.setPattion(event.EVENTTYPE);
+                        dataProtocol.setData(gson.toJson(event));
+                        client.addNewRequest(dataProtocol);
                     }
                 })
                 .onZoom(new OnZoomListener() {
                     @Override
                     public void onZoom(float centerX, float centerY, float scale) {
-                        Log.d("SpeechActivity","OnZoom事件：centerX:"+centerX+",centerY:"+centerY+",scale:"+scale);
+                        ZoomEvent event=new ZoomEvent(centerX, centerY, scale);
+                        DataProtocol dataProtocol=new DataProtocol();
+                        dataProtocol.setPattion(event.EVENTTYPE);
+                        dataProtocol.setData(gson.toJson(event));
+                        client.addNewRequest(dataProtocol);
                     }
                 })
                 .spacing(10) // in dp
                 .load();
+
     }
 
-    @OnClick(R.id.btn_test)
-    public void onClickTest(){
-        DataProtocol data=new DataProtocol();
-        data.setData("hi,imclient");
-        client.addNewRequest(data);
-    }
+
 
 
     @Override

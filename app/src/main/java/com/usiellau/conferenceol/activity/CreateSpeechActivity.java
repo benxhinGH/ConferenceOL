@@ -202,6 +202,8 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
                     }
                     Intent intent=new Intent(CreateSpeechActivity.this,SpeechActivity.class);
                     intent.putExtra("channelId",channelId);
+                    intent.putExtra("identity",0);
+                    intent.putExtra("roomId",confIngHttpResult.getResult().getId());
                     startActivity(intent);
                     finish();
                 }else{
