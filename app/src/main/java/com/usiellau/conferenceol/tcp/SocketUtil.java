@@ -1,5 +1,7 @@
 package com.usiellau.conferenceol.tcp;
 
+import android.util.Log;
+
 import com.usiellau.conferenceol.tcp.protocol.BasicProtocol;
 import com.usiellau.conferenceol.tcp.protocol.DataAckProtocol;
 import com.usiellau.conferenceol.tcp.protocol.DataProtocol;
@@ -54,9 +56,10 @@ public class SocketUtil {
      *
      * @param inputStream
      * @return
-     * @throws SocketExceptions
+     * @throws
      */
     public static BasicProtocol readFromStream(InputStream inputStream) {
+
         BasicProtocol protocol;
         BufferedInputStream bis;
 

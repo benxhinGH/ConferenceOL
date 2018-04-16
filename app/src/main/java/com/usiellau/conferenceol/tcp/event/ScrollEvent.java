@@ -30,4 +30,12 @@ public class ScrollEvent {
     public void setPositionOffset(float positionOffset) {
         this.positionOffset = positionOffset;
     }
+
+    @Override
+    public String toString() {
+        return "ScrollEvent{" +
+                "page=" + page +
+                ", positionOffset=" + positionOffset +
+                '}';
+    }
 }

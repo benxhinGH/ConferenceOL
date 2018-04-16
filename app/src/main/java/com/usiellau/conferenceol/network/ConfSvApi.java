@@ -4,7 +4,6 @@ import com.usiellau.conferenceol.network.entity.ConfFile;
 import com.usiellau.conferenceol.network.entity.ConfForecast;
 import com.usiellau.conferenceol.network.entity.ConfIng;
 import com.usiellau.conferenceol.network.entity.ConfOver;
-import com.usiellau.conferenceol.network.entity.PdfSyn;
 import com.usiellau.conferenceol.network.entity.User;
 
 
@@ -13,7 +12,6 @@ import java.util.List;
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 import okhttp3.ResponseBody;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -87,10 +85,6 @@ public interface ConfSvApi {
     @FormUrlEncoded
     @POST("download")
     Observable<ResponseBody> downloadConfFile(@Field("path") String path);
-
-    @FormUrlEncoded
-    @POST("pdf_syn")
-    Observable<HttpResult> sendPdfSyn(@Field("pdf_syn")PdfSyn pdfSyn);
 
     @POST("tcp")
     Observable<HttpResult> requestTcpLongCon();

@@ -269,9 +269,7 @@ public class ClientRequestTask implements Runnable {
                 if (inputStream != null) {
                     BasicProtocol reciverData = SocketUtil.readFromStream(inputStream);
                     if (reciverData != null) {
-                        if (reciverData.getProtocolType() == 1 || reciverData.getProtocolType() == 3) {
-                            successMessage(reciverData);
-                        }
+                        successMessage(reciverData);
                     } else {
                         break;
                     }
@@ -333,14 +331,14 @@ public class ClientRequestTask implements Runnable {
                 if (!isConnected()) {
                     break;
                 }
-
-                try {
-                    mSocket.sendUrgentData(0xFF);
-                } catch (IOException e) {
-                    isSocketAvailable = false;
-                    ClientRequestTask.this.stop();
-                    break;
-                }
+//检测远端连接是否断开的代码，循环17次时会出错，找不到原因，先不用了
+//                try {
+//                    mSocket.sendUrgentData(0xFF);
+//                } catch (IOException e) {
+//                    isSocketAvailable = false;
+//                    ClientRequestTask.this.stop();
+//                    break;
+//                }
 
                 if (outputStream != null) {
                     PingProtocol pingProtocol = new PingProtocol();

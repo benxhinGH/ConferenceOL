@@ -296,7 +296,7 @@ public class PDFView extends RelativeLayout {
         jumpTo(page, false);
     }
 
-    void showPage(int pageNb) {
+    public void showPage(int pageNb) {
         if (recycled) {
             return;
         }

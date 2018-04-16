@@ -196,7 +196,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         }
     }
 
-    private void enterRoom(ConfIng confIng){
+    private void enterRoom(final ConfIng confIng){
         ConfSvMethods.getInstance().enterRoom(new Observer<HttpResult>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -207,7 +207,23 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
             public void onNext(HttpResult httpResult) {
                 int code=httpResult.getCode();
                 String msg=httpResult.getMsg();
-                if(code!=0){
+
+                if(code==0){
+                    Intent intent=null;
+                    if(confIng.getType()==0){
+                        intent=new Intent(ConfManageActivity.this,ConferenceActivity.class);
+                        intent.putExtra("channelId",confIng.getChannelId());
+                    }else if(confIng.getType()==1){
+                        intent=new Intent(ConfManageActivity.this,SpeechActivity.class);
+                        intent.putExtra("channelId",confIng.getChannelId());
+                        intent.putExtra("identity",1);
+                        intent.putExtra("roomId",confIng.getId());
+                     }
+
+                    startActivity(intent);
+
+                    Toast.makeText(ConfManageActivity.this, "进入房间"+confIng.getChannelId(), Toast.LENGTH_SHORT).show();
+                }else{
                     Log.d("ConfManageActivity","进入房间失败，code："+code+"msg："+msg);
                 }
 
@@ -227,15 +243,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
 
 
 
-        Intent intent=new Intent(this,ConferenceActivity.class);
-        intent.putExtra("channelId",confIng.getChannelId());
-        if(confIng.getType()==1){
-            intent.putExtra("identity",1);
-            intent.putExtra("roomId",confIng.getId());
-        }
-        startActivity(intent);
 
-        Toast.makeText(this, "进入房间"+confIng.getChannelId(), Toast.LENGTH_SHORT).show();
     }
 
 

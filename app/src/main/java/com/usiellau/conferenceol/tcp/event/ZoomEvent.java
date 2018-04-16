@@ -40,4 +40,13 @@ public class ZoomEvent {
     public void setScale(float scale) {
         this.scale = scale;
     }
+
+    @Override
+    public String toString() {
+        return "ZoomEvent{" +
+                "centerX=" + centerX +
+                ", centerY=" + centerY +
+                ", scale=" + scale +
+                '}';
+    }
 }
