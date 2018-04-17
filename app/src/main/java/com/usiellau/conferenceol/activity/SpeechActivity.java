@@ -1,6 +1,7 @@
 package com.usiellau.conferenceol.activity;
 
 import android.app.ProgressDialog;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,7 +14,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.listener.OnMoveListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
+import com.github.barteksc.pdfviewer.listener.OnScaleListener;
 import com.github.barteksc.pdfviewer.listener.OnZoomListener;
 import com.google.gson.Gson;
 import com.usiellau.conferenceol.R;
@@ -23,6 +26,8 @@ import com.usiellau.conferenceol.network.entity.ConfFile;
 import com.usiellau.conferenceol.tcp.ConnectionClient;
 import com.usiellau.conferenceol.tcp.callback.RequestCallBack;
 import com.usiellau.conferenceol.tcp.event.AuthEvent;
+import com.usiellau.conferenceol.tcp.event.MoveEvent;
+import com.usiellau.conferenceol.tcp.event.ScaleEvent;
 import com.usiellau.conferenceol.tcp.event.ScrollEvent;
 import com.usiellau.conferenceol.tcp.event.ZoomEvent;
 import com.usiellau.conferenceol.tcp.protocol.BasicProtocol;
@@ -77,6 +82,17 @@ public class SpeechActivity extends AppCompatActivity {
                         ZoomEvent zoomEvent=gson.fromJson(data.getData(),ZoomEvent.class);
                         pdfView.zoomWithAnimation(zoomEvent.getCenterX(),zoomEvent.getCenterY(),zoomEvent.getScale());
                         Log.d(TAG,"收到zoom事件:"+zoomEvent.toString());
+                        break;
+                    case ScaleEvent.EVENTTYPE:
+                        ScaleEvent scaleEvent=gson.fromJson(data.getData(),ScaleEvent.class);
+                        pdfView.zoomCenteredRelativeTo(scaleEvent.getDzoom(),scaleEvent.getPivot());
+                        Log.d(TAG,"收到scale事件:"+scaleEvent.toString());
+                        break;
+                    case MoveEvent.EVENTTYPE:
+                        if(!pdfView.isZooming())return;
+                        MoveEvent moveEvent=gson.fromJson(data.getData(),MoveEvent.class);
+                        pdfView.moveTo(moveEvent.getOffsetX(),pdfView.getCurrentYOffset());
+                        Log.d(TAG,"收到move事件:"+moveEvent.toString());
                         break;
                         default:
                             break;
@@ -235,7 +251,7 @@ public class SpeechActivity extends AppCompatActivity {
                         public void onPageScrolled(int page, float positionOffset) {
                             ScrollEvent event=new ScrollEvent(page,positionOffset);
                             DataProtocol dataProtocol=new DataProtocol();
-                            dataProtocol.setPattion(event.EVENTTYPE);
+                            dataProtocol.setPattion(ScrollEvent.EVENTTYPE);
                             dataProtocol.setData(gson.toJson(event));
                             client.addNewRequest(dataProtocol);
                             Log.d(TAG,"发送scrollEvent："+event.toString());
@@ -246,12 +262,35 @@ public class SpeechActivity extends AppCompatActivity {
                         public void onZoom(float centerX, float centerY, float scale) {
                             ZoomEvent event=new ZoomEvent(centerX, centerY, scale);
                             DataProtocol dataProtocol=new DataProtocol();
-                            dataProtocol.setPattion(event.EVENTTYPE);
+                            dataProtocol.setPattion(ZoomEvent.EVENTTYPE);
                             dataProtocol.setData(gson.toJson(event));
                             client.addNewRequest(dataProtocol);
                             Log.d(TAG,"发送zoomEvent："+event.toString());
                         }
                     })
+                    .onScale(new OnScaleListener() {
+                        @Override
+                        public void onScale(float dzoom, PointF pivot) {
+                            ScaleEvent event=new ScaleEvent(dzoom, pivot);
+                            DataProtocol dataProtocol=new DataProtocol();
+                            dataProtocol.setPattion(ScaleEvent.EVENTTYPE);
+                            dataProtocol.setData(gson.toJson(event));
+                            client.addNewRequest(dataProtocol);
+                            Log.d(TAG,"发送scaleEvent："+event.toString());
+                        }
+                    })
+//                    .onMove(new OnMoveListener() {
+//                        @Override
+//                        public void onMove(float offsetX, float offsetY) {
+//                            if(!pdfView.isZooming())return;
+//                            MoveEvent event=new MoveEvent(offsetX, offsetY);
+//                            DataProtocol dataProtocol=new DataProtocol();
+//                            dataProtocol.setPattion(MoveEvent.EVENTTYPE);
+//                            dataProtocol.setData(gson.toJson(event));
+//                            client.addNewRequest(dataProtocol);
+//                            Log.d(TAG,"发送moveEvent："+event.toString());
+//                        }
+//                    })
                     .spacing(10) // in dp
                     .load();
         }else if(identity==1){
@@ -259,6 +298,8 @@ public class SpeechActivity extends AppCompatActivity {
                     .defaultPage(0)
                     .spacing(10) // in dp
                     .load();
+
+
         }
 
 

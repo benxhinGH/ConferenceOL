@@ -15,6 +15,7 @@
  */
 package com.github.barteksc.pdfviewer.listener;
 
+import android.graphics.PointF;
 import android.view.MotionEvent;
 
 import com.github.barteksc.pdfviewer.link.LinkHandler;
@@ -70,6 +71,10 @@ public class Callbacks {
     private LinkHandler linkHandler;
 
     private OnZoomListener onZoomListener;
+
+    private OnScaleListener onScaleListener;
+
+    private OnMoveListener onMoveListener;
 
     public void setOnLoadComplete(OnLoadCompleteListener onLoadCompleteListener) {
         this.onLoadCompleteListener = onLoadCompleteListener;
@@ -172,6 +177,26 @@ public class Callbacks {
     public void callOnZoom(float centerX, float centerY, float scale){
         if(onZoomListener!=null){
             onZoomListener.onZoom(centerX, centerY, scale);
+        }
+    }
+
+    public void setOnScaleListener(OnScaleListener onScaleListener){
+        this.onScaleListener=onScaleListener;
+    }
+
+    public void callOnScale(float dzoom, PointF pivot){
+        if(onScaleListener!=null){
+            onScaleListener.onScale(dzoom, pivot);
+        }
+    }
+
+    public void setOnMoveListener(OnMoveListener onMoveListener){
+        this.onMoveListener=onMoveListener;
+    }
+
+    public void callOnMove(float offsetX,float offsetY){
+        if(onMoveListener!=null){
+            onMoveListener.onMove(offsetX,offsetY);
         }
     }
 }

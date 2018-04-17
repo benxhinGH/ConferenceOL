@@ -40,10 +40,12 @@ import com.github.barteksc.pdfviewer.listener.Callbacks;
 import com.github.barteksc.pdfviewer.listener.OnDrawListener;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnMoveListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
 import com.github.barteksc.pdfviewer.listener.OnRenderListener;
+import com.github.barteksc.pdfviewer.listener.OnScaleListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.listener.OnZoomListener;
 import com.github.barteksc.pdfviewer.model.PagePart;
@@ -761,6 +763,7 @@ public class PDFView extends RelativeLayout {
      * @param moveHandle whether to move scroll handle or not
      */
     public void moveTo(float offsetX, float offsetY, boolean moveHandle) {
+        Log.d(TAG,"moveTo:offsetX:"+offsetX+"offsetY:"+offsetY);
         if (swipeVertical) {
             // Check X offset
             float scaledPageWidth = toCurrentScale(pdfFile.getMaxPageWidth());
@@ -838,6 +841,7 @@ public class PDFView extends RelativeLayout {
         callbacks.callOnPageScroll(getCurrentPage(), positionOffset);
 
         redraw();
+        callbacks.callOnMove(offsetX, offsetY);
     }
 
     void loadPageByOffset() {
@@ -904,6 +908,7 @@ public class PDFView extends RelativeLayout {
      */
     public void zoomCenteredRelativeTo(float dzoom, PointF pivot) {
         zoomCenteredTo(zoom * dzoom, pivot);
+        callbacks.callOnScale(dzoom, pivot);
     }
 
     /**
@@ -1168,6 +1173,10 @@ public class PDFView extends RelativeLayout {
 
         private OnZoomListener onZoomListener;
 
+        private OnScaleListener onScaleListener;
+
+        private OnMoveListener onMoveListener;
+
         private OnPageErrorListener onPageErrorListener;
 
         private LinkHandler linkHandler = new DefaultLinkHandler(PDFView.this);
@@ -1262,6 +1271,16 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        public Configurator onScale(OnScaleListener onScaleListener){
+            this.onScaleListener=onScaleListener;
+            return this;
+        }
+
+        public Configurator onMove(OnMoveListener onMoveListener){
+            this.onMoveListener=onMoveListener;
+            return this;
+        }
+
         public Configurator linkHandler(LinkHandler linkHandler) {
             this.linkHandler = linkHandler;
             return this;
@@ -1317,6 +1336,8 @@ public class PDFView extends RelativeLayout {
             PDFView.this.callbacks.setOnRender(onRenderListener);
             PDFView.this.callbacks.setOnTap(onTapListener);
             PDFView.this.callbacks.setOnZoomListener(onZoomListener);
+            PDFView.this.callbacks.setOnScaleListener(onScaleListener);
+            PDFView.this.callbacks.setOnMoveListener(onMoveListener);
             PDFView.this.callbacks.setOnPageError(onPageErrorListener);
             PDFView.this.callbacks.setLinkHandler(linkHandler);
             PDFView.this.setSwipeEnabled(enableSwipe);
