@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,10 +52,15 @@ import io.reactivex.disposables.Disposable;
 
 public class ConfManageActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
+    @BindView(R.id.toolbar)
     Toolbar toolbar;
+    @BindView(R.id.drawer_layout)
     DrawerLayout drawer;
+    @BindView(R.id.nav_view)
     NavigationView navigationView;
+    @BindView(R.id.rv_conf_list)
     RecyclerView rvConfList;
+    @BindView(R.id.refresh_layout)
     SwipeRefreshLayout refreshLayout;
     @BindView(R.id.create_conf_menu)
     FloatingActionsMenu createConfMenu;
@@ -62,6 +68,8 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
     FloatingActionButton videoConfBtn;
     @BindView(R.id.speech_conf)
     FloatingActionButton speechConfBtn;
+
+    ImageView userIcon;
 
     ProgressDialog progressDialog;
 
@@ -80,21 +88,20 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
     }
 
     private void initViews(){
-        toolbar=findViewById(R.id.toolbar);
+
         toolbar.setTitle("会议列表");
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        drawer=findViewById(R.id.drawer_layout);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        rvConfList=findViewById(R.id.rv_conf_list);
+
         rvConfList.setLayoutManager(new LinearLayoutManager(this));
         rvConfList.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         confListAdapter=new ConfRvAdapter(this,new ArrayList<ConfIng>());
@@ -107,7 +114,6 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         });
 
 
-        refreshLayout=findViewById(R.id.refresh_layout);
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -139,6 +145,17 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
 
             }
         });
+
+        userIcon=navigationView.getHeaderView(0).findViewById(R.id.user_icon);
+        userIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(ConfManageActivity.this,UserInfoActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
     }
 
@@ -380,6 +397,8 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         startActivity(intent);
         createConfMenu.toggle();
     }
+
+
 
     private void startActivity(final Class cls){
         drawerClosedRunnable=new Runnable() {

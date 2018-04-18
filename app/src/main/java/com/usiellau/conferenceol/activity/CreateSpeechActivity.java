@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 
 import com.gildaswise.horizontalcounter.HorizontalCounter;
+import com.google.gson.Gson;
 import com.jzxiang.pickerview.TimePickerDialog;
 import com.jzxiang.pickerview.data.Type;
 import com.jzxiang.pickerview.listener.OnDateSetListener;
@@ -26,6 +27,7 @@ import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.ConfIng;
+import com.usiellau.conferenceol.network.entity.FileDescription;
 import com.usiellau.conferenceol.util.Utils;
 
 import java.io.File;
@@ -226,7 +228,9 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
     }
 
     private void uploadFile(String channelId, final Runnable afterWork){
-        ConfSvMethods.getInstance().uploadFile(new Observer<HttpResult>() {
+        FileDescription fileDescription=new FileDescription(FileDescription.TYPE_CONF_FILE,channelId);
+        Gson gson=new Gson();
+        ConfSvMethods.getInstance().uploadFile(new Observer<HttpResult<String>>() {
             @Override
             public void onSubscribe(Disposable d) {
                 showProgressDialog();
@@ -255,7 +259,7 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
             public void onComplete() {
                 closeProgressDialog();
             }
-        },channelId,fileSelected);
+        },gson.toJson(fileDescription),fileSelected);
     }
 
     public void createForecast(String channelId,boolean hasFile){

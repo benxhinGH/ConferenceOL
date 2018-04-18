@@ -35,6 +35,7 @@ public interface ConfSvApi {
     Observable<HttpResult> register(@Field("phonenumber") String phonenumber,
                                     @Field("authcode") String authcode,
                                     @Field("password") String password);
+
     @FormUrlEncoded
     @POST("authcode")
     Observable<HttpResult> sendAuthcode(@Field("phonenumber") String phonenumber);
@@ -66,7 +67,7 @@ public interface ConfSvApi {
                                           @Field("start_time")long startTime);
     @Multipart
     @POST("upload")
-    Observable<HttpResult> uploadFile(@Part("description") RequestBody description,
+    Observable<HttpResult<String>> uploadFile(@Part("description") RequestBody description,
                                                 @Part MultipartBody.Part file);
     @FormUrlEncoded
     @POST("room")

@@ -39,6 +39,7 @@
         <activity android:name=".activity.ForecastActivity"/>
         <activity android:name=".activity.FileManageActivity"/>
         <activity android:name=".activity.PdfViewActivity"/>
+        <activity android:name=".activity.UserInfoActivity"/>
     </application>
 
 

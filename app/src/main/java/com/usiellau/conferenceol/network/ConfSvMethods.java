@@ -137,7 +137,7 @@ public class ConfSvMethods {
                 .subscribe(observer);
     }
 
-    public void uploadFile(Observer<HttpResult> observer,String description, File file){
+    public void uploadFile(Observer<HttpResult<String>> observer,String description, File file){
         RequestBody requestFile =
                 RequestBody.create(MediaType.parse("multipart/form-data"), file);
 

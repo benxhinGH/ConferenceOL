@@ -41,6 +41,10 @@ public class LoginActivity extends AppCompatActivity{
     @BindView(R.id.btn_login)
     Button btnLogin;
 
+
+    @BindView(R.id.btn_debug)
+    Button debugBtn;
+
     ProgressDialog progressDialog;
 
 
@@ -162,4 +166,10 @@ public class LoginActivity extends AppCompatActivity{
     }
 
 
+    @OnClick(R.id.btn_debug)
+    void onClickDebug(){
+        Intent intent=new Intent(this,ConfManageActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
