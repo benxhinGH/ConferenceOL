@@ -2,11 +2,13 @@ package com.usiellau.conferenceol.network;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.usiellau.conferenceol.network.entity.ConfFile;
 import com.usiellau.conferenceol.network.entity.ConfForecast;
 import com.usiellau.conferenceol.network.entity.ConfIng;
 import com.usiellau.conferenceol.network.entity.ConfOver;
 import com.usiellau.conferenceol.network.entity.User;
+import com.usiellau.conferenceol.network.entity.UserUpdateInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -43,6 +46,7 @@ public class ConfSvMethods {
 
     private Retrofit retrofit;
     private ConfSvApi confSvApi;
+    private Gson gson=new Gson();
 
 
     private ConfSvMethods(){
@@ -169,8 +173,8 @@ public class ConfSvMethods {
                 .subscribe(observer);
     }
 
-    public void downloadConfFile(Observer<Boolean> observer, String serverPath, final String localPath){
-        confSvApi.downloadConfFile(serverPath)
+    public void downloadFile(Observer<Boolean> observer, String serverPath, final String localPath){
+        confSvApi.downloadFile(serverPath)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -181,6 +185,7 @@ public class ConfSvMethods {
                     }
                 })
                 .subscribe(observer);
+        Log.d("ConfSvMethods","下载文件："+serverPath+"保存到："+localPath);
     }
 
     public void queryConfFile(Observer<HttpResult<ConfFile>> observer,String channelId){
@@ -198,6 +203,23 @@ public class ConfSvMethods {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
     }
+
+    public void updateUserInfo(Observer<HttpResult> observer, UserUpdateInfo info){
+        confSvApi.updateUserInfo(gson.toJson(info))
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
+    public void queryUserInfo(Observer<HttpResult<User>> observer,String username){
+        confSvApi.queryUserInfo(username)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+    }
+
     private boolean writeResponseBodyToDisk(ResponseBody body,String path) {
         try {
             // todo change the file location/name according to your needs

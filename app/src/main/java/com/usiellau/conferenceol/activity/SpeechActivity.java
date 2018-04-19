@@ -143,7 +143,7 @@ public class SpeechActivity extends AppCompatActivity {
                     Log.d("SpeechActivity","文件不存在，向服务器下载");
                     String localPath=Utils.getDefaultFileSavePath(SpeechActivity.this)+File.separator+confFile.getName();
                     Log.d(TAG,"文件存储路径："+localPath);
-                    ConfSvMethods.getInstance().downloadConfFile(new Observer<Boolean>() {
+                    ConfSvMethods.getInstance().downloadFile(new Observer<Boolean>() {
                         @Override
                         public void onSubscribe(Disposable d) {
                             showProgressDialog();

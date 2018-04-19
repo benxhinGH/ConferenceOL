@@ -79,9 +79,10 @@ public class LoginActivity extends AppCompatActivity{
             public void onNext(HttpResult<User> userHttpResult) {
                 int code=userHttpResult.getCode();
                 String msg=userHttpResult.getMsg();
+                User user=userHttpResult.getResult();
                 if(code==0){
                     Toast.makeText(LoginActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
-                    Utils.saveLastLogined(getBaseContext(),userHttpResult.getResult().getId(),username,password);
+                    Utils.saveLastLogined(getBaseContext(),user);
                     Intent intent=new Intent(LoginActivity.this,ConfManageActivity.class);
                     startActivity(intent);
                     finish();

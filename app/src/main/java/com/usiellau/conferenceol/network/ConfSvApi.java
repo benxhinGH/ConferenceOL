@@ -85,10 +85,18 @@ public interface ConfSvApi {
 
     @FormUrlEncoded
     @POST("download")
-    Observable<ResponseBody> downloadConfFile(@Field("path") String path);
+    Observable<ResponseBody> downloadFile(@Field("path") String path);
 
     @POST("tcp")
     Observable<HttpResult> requestTcpLongCon();
+
+    @FormUrlEncoded
+    @POST("user_update")
+    Observable<HttpResult> updateUserInfo(@Field("update_info")String updateInfoJson);
+
+
+    @GET("user")
+    Observable<HttpResult<User>> queryUserInfo(@Query("username")String username);
 
 
 }

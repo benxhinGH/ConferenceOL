@@ -138,7 +138,7 @@ public class ForecastFragment extends Fragment {
     }
 
     private void downloadConfFile(ConfFile confFile){
-        ConfSvMethods.getInstance().downloadConfFile(new Observer<Boolean>() {
+        ConfSvMethods.getInstance().downloadFile(new Observer<Boolean>() {
             @Override
             public void onSubscribe(Disposable d) {
                 showProgressDialog();

@@ -9,6 +9,15 @@ public class User {
     private String nickname;
     private String phonenumber;
     private String password;
+    private String headImageUrl;
+
+    public User(int id, String nickname, String phonenumber, String password, String headImageUrl) {
+        this.id = id;
+        this.nickname = nickname;
+        this.phonenumber = phonenumber;
+        this.password = password;
+        this.headImageUrl = headImageUrl;
+    }
 
     public int getId() {
         return id;
@@ -38,6 +47,14 @@ public class User {
         this.password = password;
     }
 
+    public String getHeadImageUrl() {
+        return headImageUrl;
+    }
+
+    public void setHeadImageUrl(String headImageUrl) {
+        this.headImageUrl = headImageUrl;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -45,6 +62,7 @@ public class User {
                 ", nickname='" + nickname + '\'' +
                 ", phonenumber='" + phonenumber + '\'' +
                 ", password='" + password + '\'' +
+                ", headImageUrl='" + headImageUrl + '\'' +
                 '}';
     }
 }

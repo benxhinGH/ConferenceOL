@@ -1,8 +1,10 @@
 package com.usiellau.conferenceol.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -10,13 +12,20 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
+import com.google.gson.Gson;
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
+import com.luck.picture.lib.tools.ToastManage;
 import com.usiellau.conferenceol.R;
+import com.usiellau.conferenceol.network.ConfSvMethods;
+import com.usiellau.conferenceol.network.HttpResult;
+import com.usiellau.conferenceol.network.entity.FileDescription;
+import com.usiellau.conferenceol.util.Utils;
 
 import java.io.File;
 import java.util.List;
@@ -24,6 +33,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by UsielLau on 2018/4/18 0018 16:22.
@@ -43,6 +54,9 @@ public class UserInfoActivity extends AppCompatActivity {
     @BindView(R.id.tv_nickname)
     TextView tvNickname;
 
+    
+    ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,9 +72,15 @@ public class UserInfoActivity extends AppCompatActivity {
                 finish();
             }
         });
+        initData();
     }
     private void initData(){
-
+        String nickName=PreferenceManager.getDefaultSharedPreferences(this).getString("nickname","null");
+        tvNickname.setText(nickName);
+        String imagePath=PreferenceManager.getDefaultSharedPreferences(this).getString("imagePath","");
+        String fileName=imagePath.substring(imagePath.lastIndexOf("\\")+1);
+        String localPath=Utils.getDefaultFileSavePath(this)+ File.separator+fileName;
+        ivHead.setImageURI(Uri.fromFile(new File(localPath)));
     }
 
     @OnClick(R.id.head_image_layout)
@@ -73,6 +93,12 @@ public class UserInfoActivity extends AppCompatActivity {
                 .enableCrop(true)
                 .withAspectRatio(1,1)
                 .forResult(PictureConfig.CHOOSE_REQUEST);
+    }
+
+    @OnClick(R.id.nickname_layout)
+    void onClickNicknameLayout(){
+        Intent intent=new Intent(this,NicknameActivity.class);
+        startActivityForResult(intent,11);
     }
 
     @Override
@@ -95,10 +121,64 @@ public class UserInfoActivity extends AppCompatActivity {
                     }else{
                         path=media.getPath();
                     }
-
-                    ivHead.setImageURI(Uri.fromFile(new File(path)));
+                    uploadImage(new File(path));
                     break;
+                case 11:
+                    String nickname=PreferenceManager.getDefaultSharedPreferences(this).getString("nickname","null");
+                    tvNickname.setText(nickname);
+                    break;
+                    default:
+                        break;
             }
         }
+    }
+    
+    private void uploadImage(final File file){
+        FileDescription description=new FileDescription(FileDescription.TYPE_USER_HEAD_IMAGE, 
+                PreferenceManager.getDefaultSharedPreferences(this).getString("username",""));
+        Gson gson=new Gson();
+        ConfSvMethods.getInstance().uploadFile(new Observer<HttpResult<String>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+                showProgressDialog();
+            }
+
+            @Override
+            public void onNext(HttpResult<String> stringHttpResult) {
+                if(stringHttpResult.getCode()==0){
+                    Toast.makeText(UserInfoActivity.this, "上传成功", Toast.LENGTH_SHORT).show();
+                    ivHead.setImageURI(Uri.fromFile(file));
+                    String suffix=file.getPath().substring(file.getPath().lastIndexOf("."));
+                    Utils.copySdcardFile(file.getPath(),
+                            Utils.getDefaultFileSavePath(UserInfoActivity.this)+File.separator+"headImage"+suffix);
+                    Utils.updateLocalUserInfo(UserInfoActivity.this);
+                }else{
+                    Toast.makeText(UserInfoActivity.this, "上传失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(UserInfoActivity.this, "error", Toast.LENGTH_SHORT).show();
+                closeProgressDialog();
+            }
+
+            @Override
+            public void onComplete() {
+                closeProgressDialog();
+            }
+        },gson.toJson(description),file);
+    }
+
+    private void showProgressDialog(){
+        if(progressDialog==null){
+            progressDialog=new ProgressDialog(this);
+            progressDialog.setMessage("上传头像中...");
+        }
+        progressDialog.show();
+    }
+
+    private void closeProgressDialog(){
+        progressDialog.cancel();
     }
 }

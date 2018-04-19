@@ -39,12 +39,39 @@ import io.reactivex.disposables.Disposable;
 public class Utils {
 
     // 保存最后一次登录账号信息
-    public static void saveLastLogined(Context context,int uid,String username, String password) {
+    public static void saveLastLogined(Context context,User user) {
         PreferenceManager.getDefaultSharedPreferences(context).edit()
-                .putInt("uid",uid)
-                .putString("username", username)
-                .putString("password", password)
+                .putInt("uid",user.getId())
+                .putString("username", user.getPhonenumber())
+                .putString("password", user.getPassword())
+                .putString("nickname",user.getNickname())
+                .putString("imagePath",user.getHeadImageUrl())
                 .apply();
+    }
+
+    public static void updateLocalUserInfo(final Context context){
+        String username=PreferenceManager.getDefaultSharedPreferences(context).getString("username","");
+        ConfSvMethods.getInstance().queryUserInfo(new Observer<HttpResult<User>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult<User> userHttpResult) {
+                saveLastLogined(context,userHttpResult.getResult());
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        },username);
     }
 
     public static String getDefaultFileSavePath(Context context){
