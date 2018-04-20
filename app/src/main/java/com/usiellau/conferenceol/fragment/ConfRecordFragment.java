@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,14 +38,14 @@ import io.reactivex.disposables.Disposable;
  */
 public class ConfRecordFragment extends Fragment {
 
-    @BindView(R.id.recyclerview)
+    @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
     @BindView(R.id.refresh_layout)
     SwipeRefreshLayout refreshLayout;
 
     ConfRecordRvAdapter adapter;
 
-    List<ConfOver> datas;
+    List<ConfOver> adapterDatas;
 
     private int confType;
 
@@ -58,6 +59,7 @@ public class ConfRecordFragment extends Fragment {
         unbinder= ButterKnife.bind(this,rootView);
         Bundle args=getArguments();
         confType=args.getInt("confType");
+        Log.d("ConfRecordFragment","confType是："+confType);
         adapter=new ConfRecordRvAdapter(getActivity());
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -90,7 +92,7 @@ public class ConfRecordFragment extends Fragment {
         TextView tvCreateTime=rootView.findViewById(R.id.tv_create_time);
         TextView tvDuration=rootView.findViewById(R.id.tv_duration);
         TextView tvParticipator=rootView.findViewById(R.id.tv_conf_participator);
-        ConfOver data=datas.get(position);
+        ConfOver data=adapterDatas.get(position);
         tvConfTitle.setText(data.getTitle());
         tvCreator.setText(data.getCreator());
         tvCreateTime.setText(data.getCreateTime().toString());
@@ -129,9 +131,8 @@ public class ConfRecordFragment extends Fragment {
             public void onNext(HttpResult<List<ConfOver>> listHttpResult) {
                 if(listHttpResult.getCode()==0){
                     List<ConfOver> datas=listHttpResult.getResult();
-                    filterDatas(datas);
-                    ConfRecordFragment.this.datas=datas;
-                    adapter.setDatas(datas);
+                    adapterDatas=filterDatas(datas);
+                    adapter.setDatas(adapterDatas);
                 }
 
             }
@@ -149,14 +150,14 @@ public class ConfRecordFragment extends Fragment {
         });
     }
 
-    private void filterDatas(List<ConfOver> datas){
-        List<ConfOver> out=new ArrayList<>();
+    private List<ConfOver> filterDatas(List<ConfOver> datas){
+        List<ConfOver> valid=new ArrayList<>();
         for(ConfOver confOver:datas){
-            if(confOver.getType()!=confType){
-                out.add(confOver);
+            if(confOver.getType()==confType){
+                valid.add(confOver);
             }
         }
-        datas.remove(out);
+        return valid;
     }
 
 

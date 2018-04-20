@@ -407,6 +407,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
                 startActivity(ForecastActivity.class);
                 break;
             case R.id.nav_conf_record:
+                startActivity(ConfRecordActivity.class);
                 Toast.makeText(this, "record", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_conf_file:

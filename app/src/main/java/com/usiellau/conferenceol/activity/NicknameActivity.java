@@ -27,6 +27,8 @@ import io.reactivex.disposables.Disposable;
  */
 public class NicknameActivity extends AppCompatActivity {
 
+    private String title="输入新昵称";
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.et_nickname)
@@ -42,6 +44,7 @@ public class NicknameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nickname);
         ButterKnife.bind(this);
+        toolbar.setTitle(title);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {

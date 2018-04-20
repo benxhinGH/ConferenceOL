@@ -157,9 +157,6 @@ public class UserInfoActivity extends AppCompatActivity {
                 if(stringHttpResult.getCode()==0){
                     Toast.makeText(UserInfoActivity.this, "上传成功", Toast.LENGTH_SHORT).show();
                     ivHead.setImageURI(Uri.fromFile(file));
-                    String suffix=file.getPath().substring(file.getPath().lastIndexOf("."));
-                    Utils.copySdcardFile(file.getPath(),
-                            Utils.getDefaultFileSavePath(UserInfoActivity.this)+File.separator+"headImage"+suffix);
                     Utils.updateLocalUserInfo(UserInfoActivity.this);
                 }else{
                     Toast.makeText(UserInfoActivity.this, "上传失败", Toast.LENGTH_SHORT).show();

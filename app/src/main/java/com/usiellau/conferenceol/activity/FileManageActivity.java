@@ -9,6 +9,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -45,7 +46,7 @@ public class FileManageActivity extends AppCompatActivity {
     @BindView(R.id.rv_file)
     RecyclerView rvFile;
 
-    private File[] files;
+    private List<File> files;
 
     private FileRvAdapter adapter;
 
@@ -80,11 +81,15 @@ public class FileManageActivity extends AppCompatActivity {
     }
 
     private void initDatas(){
-        Observable<File[]> observable=Observable.create(new ObservableOnSubscribe<File[]>() {
+        Observable<List<File>> observable=Observable.create(new ObservableOnSubscribe<List<File>>() {
             @Override
-            public void subscribe(ObservableEmitter<File[]> emitter) throws Exception {
+            public void subscribe(ObservableEmitter<List<File>> emitter) throws Exception {
                 File folder=getExternalFilesDir(null);
-                files=folder.listFiles();
+                File[] temp=folder.listFiles();
+                files=new ArrayList<>();
+                for(File file:temp){
+                    if(file.getName().contains(".pdf"))files.add(file);
+                }
                 emitter.onNext(files);
             }
         });
@@ -92,9 +97,9 @@ public class FileManageActivity extends AppCompatActivity {
                 .observeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .map(new Function<File[], List<String>>() {
+                .map(new Function<List<File>, List<String>>() {
             @Override
-            public List<String> apply(File[] files) throws Exception {
+            public List<String> apply(List<File> files) throws Exception {
                 List<String> list=new ArrayList<>();
                 for(File file:files){
                     list.add(file.getName());
@@ -129,7 +134,7 @@ public class FileManageActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 Intent intent=new Intent(FileManageActivity.this,PdfViewActivity.class);
-                intent.putExtra("fileName",files[position].getName());
+                intent.putExtra("fileName",files.get(position).getName());
                 startActivity(intent);
             }
 
@@ -150,8 +155,8 @@ public class FileManageActivity extends AppCompatActivity {
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            if(files[position].delete()){
-                                files[position]=null;
+                            if(files.get(position).delete()){
+                                files.remove(position);
                                 adapter.removeData(position);
                                 Toast.makeText(FileManageActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
                             }else{

@@ -41,10 +41,6 @@ public class LoginActivity extends AppCompatActivity{
     @BindView(R.id.btn_login)
     Button btnLogin;
 
-
-    @BindView(R.id.btn_debug)
-    Button debugBtn;
-
     ProgressDialog progressDialog;
 
 
@@ -54,7 +50,7 @@ public class LoginActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-        loginIfLastLogined();
+        autoCompletedIfLastLogined();
     }
 
 
@@ -106,7 +102,7 @@ public class LoginActivity extends AppCompatActivity{
         },username,password);
     }
 
-    private void loginIfLastLogined(){
+    private void autoCompletedIfLastLogined(){
         String username = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("username", null);
         if (TextUtils.isEmpty(username)) {
@@ -114,38 +110,8 @@ public class LoginActivity extends AppCompatActivity{
         }
         String password = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString("password", null);
-        ConfSvMethods.getInstance().login(new Observer<HttpResult<User>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(HttpResult<User> userHttpResult) {
-                int code=userHttpResult.getCode();
-                String msg=userHttpResult.getMsg();
-                if(code==0){
-                    Toast.makeText(LoginActivity.this, "自动登录成功", Toast.LENGTH_SHORT).show();
-                    Intent intent=new Intent(LoginActivity.this,ConfManageActivity.class);
-                    startActivity(intent);
-                    finish();
-                }else{
-                    Toast.makeText(LoginActivity.this, "自动登录失败", Toast.LENGTH_SHORT).show();
-                }
-                Log.d("LoginActivity",userHttpResult.toString());
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Toast.makeText(LoginActivity.this, "error", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        },username,password);
+        etUsername.setText(username);
+        etPassword.setText(password);
     }
 
     @OnClick(R.id.btn_register)
@@ -167,10 +133,4 @@ public class LoginActivity extends AppCompatActivity{
     }
 
 
-    @OnClick(R.id.btn_debug)
-    void onClickDebug(){
-        Intent intent=new Intent(this,ConfManageActivity.class);
-        startActivity(intent);
-        finish();
-    }
 }

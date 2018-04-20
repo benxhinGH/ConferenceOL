@@ -7,6 +7,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
@@ -166,6 +167,18 @@ public class Utils {
             }
         }
         return "";
+    }
+
+    public static int[] getAndroiodScreenProperty(Context context) {
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics dm = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;         // 屏幕宽度（像素）
+        int height = dm.heightPixels;
+        int[] res=new int[2];
+        res[0]=width;
+        res[1]=height;
+        return res;
     }
 
     public static String longTime2String(long time){
