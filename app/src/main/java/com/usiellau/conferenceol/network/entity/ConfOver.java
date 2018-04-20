@@ -10,14 +10,16 @@ import java.sql.Timestamp;
 public class ConfOver {
     private int id;
     private String title;
+    private int type;
     private String creator;
     private Timestamp createTime;
     private int duration;
     private String participator;
-    public ConfOver(int id, String title, String creator, Timestamp createTime,
+    public ConfOver(int id, String title, int type,String creator, Timestamp createTime,
                     int duration, String participator) {
         this.id = id;
         this.title = title;
+        this.type=type;
         this.creator = creator;
         this.createTime = createTime;
         this.duration = duration;
@@ -46,5 +48,26 @@ public class ConfOver {
 
     public String getParticipator() {
         return participator;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "ConfOver{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", type=" + type +
+                ", creator='" + creator + '\'' +
+                ", createTime=" + createTime +
+                ", duration=" + duration +
+                ", participator='" + participator + '\'' +
+                '}';
     }
 }

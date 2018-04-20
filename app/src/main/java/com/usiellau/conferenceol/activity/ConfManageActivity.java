@@ -89,6 +89,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         ButterKnife.bind(this);
         initViews();
         refreshConfList();
+        refreshNavigationHeader();
     }
 
     private void initViews(){
@@ -151,13 +152,6 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         });
 
         userIcon=navigationView.getHeaderView(0).findViewById(R.id.user_icon);
-        userIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(UserInfoActivity.class);
-                drawer.closeDrawer(GravityCompat.START);
-            }
-        });
 
         tvNickname=navigationView.getHeaderView(0).findViewById(R.id.tv_nickname);
 
@@ -405,7 +399,8 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
 
         switch (item.getItemId()){
             case R.id.nav_personal:
-                Toast.makeText(this, "personal", Toast.LENGTH_SHORT).show();
+                startActivity(UserInfoActivity.class);
+                drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_conf_forecast:
                 Toast.makeText(this, "forecast", Toast.LENGTH_SHORT).show();

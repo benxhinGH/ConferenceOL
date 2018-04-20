@@ -31,7 +31,10 @@
         </activity>
         <activity android:name=".activity.LoginActivity"/>
         <activity android:name=".activity.RegisterActivity"/>
-        <activity android:name=".activity.ConfManageActivity"/>
+        <activity
+            android:name=".activity.ConfManageActivity"
+            android:launchMode="singleTask"/>
+
         <activity android:name=".activity.CreateConfActivity"/>
         <activity android:name=".activity.ConferenceActivity"/>
         <activity android:name=".activity.CreateSpeechActivity"/>
@@ -41,6 +44,7 @@
         <activity android:name=".activity.PdfViewActivity"/>
         <activity android:name=".activity.UserInfoActivity"/>
         <activity android:name=".activity.NicknameActivity"/>
+        <activity android:name=".activity.ConfRecordActivity"/>
     </application>
 
 

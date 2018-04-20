@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,7 +21,6 @@ import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.config.PictureMimeType;
 import com.luck.picture.lib.entity.LocalMedia;
-import com.luck.picture.lib.tools.ToastManage;
 import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
@@ -53,6 +53,8 @@ public class UserInfoActivity extends AppCompatActivity {
     RelativeLayout nicknameLayout;
     @BindView(R.id.tv_nickname)
     TextView tvNickname;
+    @BindView(R.id.btn_logout)
+    Button btnLogout;
 
     
     ProgressDialog progressDialog;
@@ -99,6 +101,13 @@ public class UserInfoActivity extends AppCompatActivity {
     void onClickNicknameLayout(){
         Intent intent=new Intent(this,NicknameActivity.class);
         startActivityForResult(intent,11);
+    }
+
+    @OnClick(R.id.btn_logout)
+    void onClickBtnLogout(){
+        Intent intent=new Intent(this,LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
