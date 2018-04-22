@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.usiellau.conferenceol.R;
+import com.usiellau.conferenceol.tools.BitmapCacher;
 import com.usiellau.conferenceol.tools.ImageLoader;
 import com.usiellau.conferenceol.util.Utils;
 

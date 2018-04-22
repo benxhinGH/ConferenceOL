@@ -2,6 +2,8 @@ package com.usiellau.conferenceol.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -37,6 +39,8 @@ import com.usiellau.conferenceol.adapter.ConfRvAdapter;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.ConfIng;
+import com.usiellau.conferenceol.tools.BitmapCacher;
+import com.usiellau.conferenceol.tools.ImageLoader;
 import com.usiellau.conferenceol.util.Utils;
 
 import java.io.File;
@@ -164,13 +168,13 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
 
         String imagePath=PreferenceManager.getDefaultSharedPreferences(this).getString("imagePath","");
         if(imagePath.equals(""))return;
-        String fileName=imagePath.substring(imagePath.lastIndexOf("\\")+1);
+        final String fileName=imagePath.substring(imagePath.lastIndexOf("\\")+1);
         final String localPath=Utils.getDefaultFileSavePath(this)+ File.separator+fileName;
-//        File file=new File(localPath);
-//        if(file.exists()){
-//            userIcon.setImageURI(Uri.fromFile(file));
-//            return;
-//        }
+        if(BitmapCacher.getInstance().get(fileName)!=null){
+            Log.d("ConfManageActivity","头像已缓存");
+            return;
+        }
+
 
         ConfSvMethods.getInstance().downloadFile(new Observer<Boolean>() {
             @Override
@@ -181,7 +185,10 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
             @Override
             public void onNext(Boolean aBoolean) {
                 if(aBoolean){
-                    userIcon.setImageURI(Uri.fromFile(new File(localPath)));
+                    File file=new File(localPath);
+                    Bitmap bitmap=ImageLoader.decodeSampledBitmapFromFile(file,userIcon.getWidth(),userIcon.getHeight());
+                    userIcon.setImageBitmap(bitmap);
+                    BitmapCacher.getInstance().put(fileName, bitmap);
                 }else{
                     Toast.makeText(ConfManageActivity.this, "下载头像失败", Toast.LENGTH_SHORT).show();
                 }

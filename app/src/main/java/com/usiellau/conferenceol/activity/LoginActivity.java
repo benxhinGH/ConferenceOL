@@ -2,6 +2,8 @@ package com.usiellau.conferenceol.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -11,6 +13,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 
@@ -18,6 +22,8 @@ import com.usiellau.conferenceol.R;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.User;
+import com.usiellau.conferenceol.tools.BitmapCacher;
+import com.usiellau.conferenceol.tools.ImageLoader;
 import com.usiellau.conferenceol.util.Utils;
 
 import butterknife.BindView;
@@ -40,6 +46,8 @@ public class LoginActivity extends AppCompatActivity{
     Button btnRegister;
     @BindView(R.id.btn_login)
     Button btnLogin;
+    @BindView(R.id.iv_background)
+    ImageView ivBackground;
 
     ProgressDialog progressDialog;
 
@@ -52,6 +60,7 @@ public class LoginActivity extends AppCompatActivity{
         ButterKnife.bind(this);
         autoCompletedIfLastLogined();
     }
+
 
 
     @OnClick(R.id.btn_login)
