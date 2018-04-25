@@ -202,12 +202,7 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
                         Utils.copySdcardFile(sp,dp);
                         Log.d(TAG,"复制文件，原路径："+sp+"目的路径："+dp);
                     }
-                    Intent intent=new Intent(CreateSpeechActivity.this,SpeechActivity.class);
-                    intent.putExtra("channelId",channelId);
-                    intent.putExtra("identity",0);
-                    intent.putExtra("roomId",confIngHttpResult.getResult().getId());
-                    startActivity(intent);
-                    finish();
+                    enterRoomAndStartActivity(channelId,confIngHttpResult.getResult().getId());
                 }else{
                     Toast.makeText(CreateSpeechActivity.this, "创建speech失败", Toast.LENGTH_SHORT).show();
                 }
@@ -225,6 +220,41 @@ public class CreateSpeechActivity extends AppCompatActivity implements OnDateSet
                 closeProgressDialog();
             }
         },title,type,password,channelId,capacity,creator,hasFile);
+    }
+
+    private void enterRoomAndStartActivity(final String channelId, final int roomId){
+        ConfSvMethods.getInstance().enterRoom(new Observer<HttpResult>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult httpResult) {
+                if(httpResult.getCode()==0){
+                    Log.d("CreateSpeechActivity","进入房间成功");
+                    Intent intent=new Intent(CreateSpeechActivity.this,SpeechActivity.class);
+                    intent.putExtra("channelId",channelId);
+                    intent.putExtra("identity",0);
+                    intent.putExtra("roomId",roomId);
+                    startActivity(intent);
+                    finish();
+                }else{
+                    Log.d("CreateSpeechActivity","进入房间失败："+httpResult.toString());
+                }
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(CreateSpeechActivity.this, "error", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        },channelId,PreferenceManager.getDefaultSharedPreferences(this).getString("username",""));
     }
 
     private void uploadFile(String channelId, final Runnable afterWork){

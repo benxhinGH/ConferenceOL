@@ -95,8 +95,8 @@ public class ConfRecordFragment extends Fragment {
         ConfOver data=adapterDatas.get(position);
         tvConfTitle.setText(data.getTitle());
         tvCreator.setText(data.getCreator());
-        tvCreateTime.setText(data.getCreateTime().toString());
-        tvDuration.setText(Utils.longTime2String(data.getDuration()));
+        tvCreateTime.setText(Utils.longTime2String(data.getCreateTime()));
+        tvDuration.setText(Utils.longPeriod2String(data.getDuration()));
         tvParticipator.setText(data.getParticipator());
 
         String title="";

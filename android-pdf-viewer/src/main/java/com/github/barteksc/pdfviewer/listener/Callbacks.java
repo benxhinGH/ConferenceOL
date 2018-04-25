@@ -174,9 +174,9 @@ public class Callbacks {
         this.onZoomListener=onZoomListener;
     }
 
-    public void callOnZoom(float centerX, float centerY, float scale){
+    public void callOnZoom(float zoom){
         if(onZoomListener!=null){
-            onZoomListener.onZoom(centerX, centerY, scale);
+            onZoomListener.onZoom(zoom);
         }
     }
 

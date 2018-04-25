@@ -8,6 +8,9 @@ public class AuthEvent {
     public static final int EVENTTYPE=0;
     public static final String AUTH_SUCCESS="identity verification";
 
+    public static final int TYPE_SPEAKER=0;
+    public static final int TYPE_PARTICIPATOR=1;
+
     private int roomId;
     /**
      * 0为主讲人，1为参会者

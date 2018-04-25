@@ -187,6 +187,28 @@ public class Utils {
         return sf.format(d);
     }
 
+    public static String longPeriod2String(long time){
+        time=time/1000;
+        int second=(int)(time%60);
+        int minutes=(int)(time-second)/60;
+        int minute=minutes%60;
+        int hour=minutes/60;
+        String secondStr=turnTimeItemToString(second);
+        String minuteStr=turnTimeItemToString(minute);
+        String hourStr=turnTimeItemToString(hour);
+        return hourStr+":"+minuteStr+":"+secondStr;
+    }
+
+    private static String turnTimeItemToString(int i){
+        String res="";
+        if(i>=10){
+            res+=i;
+        }else{
+            res="0"+i;
+        }
+        return res;
+    }
+
     public static String getUUID(){
         String uuid= UUID.randomUUID().toString();
         String r=uuid.replaceAll("-","");

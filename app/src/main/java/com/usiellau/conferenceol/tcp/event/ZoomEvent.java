@@ -7,46 +7,24 @@ public class ZoomEvent {
 
     public static final int EVENTTYPE=2;
 
-    private float centerX;
-    private float centerY;
-    private float scale;
+    private float zoom;
 
-    public ZoomEvent(float centerX, float centerY, float scale) {
-        this.centerX = centerX;
-        this.centerY = centerY;
-        this.scale = scale;
+    public ZoomEvent(float zoom){
+        this.zoom=zoom;
     }
 
-    public float getCenterX() {
-        return centerX;
+    public float getZoom() {
+        return zoom;
     }
 
-    public void setCenterX(float centerX) {
-        this.centerX = centerX;
-    }
-
-    public float getCenterY() {
-        return centerY;
-    }
-
-    public void setCenterY(float centerY) {
-        this.centerY = centerY;
-    }
-
-    public float getScale() {
-        return scale;
-    }
-
-    public void setScale(float scale) {
-        this.scale = scale;
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
     }
 
     @Override
     public String toString() {
         return "ZoomEvent{" +
-                "centerX=" + centerX +
-                ", centerY=" + centerY +
-                ", scale=" + scale +
+                "zoom=" + zoom +
                 '}';
     }
 }

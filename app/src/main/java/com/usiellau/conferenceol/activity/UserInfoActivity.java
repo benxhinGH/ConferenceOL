@@ -80,7 +80,7 @@ public class UserInfoActivity extends AppCompatActivity {
         String nickName=PreferenceManager.getDefaultSharedPreferences(this).getString("nickname","null");
         tvNickname.setText(nickName);
         String imagePath=PreferenceManager.getDefaultSharedPreferences(this).getString("imagePath","");
-        String fileName=imagePath.substring(imagePath.lastIndexOf("\\")+1);
+        String fileName=imagePath.substring(imagePath.lastIndexOf("/")+1);
         String localPath=Utils.getDefaultFileSavePath(this)+ File.separator+fileName;
         ivHead.setImageURI(Uri.fromFile(new File(localPath)));
     }

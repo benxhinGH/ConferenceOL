@@ -168,7 +168,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
 
         String imagePath=PreferenceManager.getDefaultSharedPreferences(this).getString("imagePath","");
         if(imagePath.equals(""))return;
-        final String fileName=imagePath.substring(imagePath.lastIndexOf("\\")+1);
+        final String fileName=imagePath.substring(imagePath.lastIndexOf("/")+1);
         final String localPath=Utils.getDefaultFileSavePath(this)+ File.separator+fileName;
         if(BitmapCacher.getInstance().get(fileName)!=null){
             Log.d("ConfManageActivity","头像已缓存");
@@ -230,7 +230,7 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         }
         tvCapacity.setText(String.valueOf(confIng.getCapacity()));
         tvCreator.setText(confIng.getCreator());
-        tvStartTime.setText(confIng.getCreateTime().toString());
+        tvStartTime.setText(Utils.longTime2String(confIng.getCreateTime()));
 
         MaterialDialog dialog=new MaterialDialog.Builder(this)
                 .title(title)

@@ -41,7 +41,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfSvMethods {
 
-    public static final String BASE_URL="http://192.168.1.101:8090/ConfOL/";
+    public static final String REMOTE_SERVER_ADDRESS="180.76.106.214:8080";
+    public static final String LOCAL_SERVER_ADDRESS="192.168.1.101:8090";
+
+
+    public static final String BASE_URL="http://"+REMOTE_SERVER_ADDRESS+"/ConfOL/";
     private static final int DEFAULT_TIMEOUT=5;
 
     private Retrofit retrofit;

@@ -19,7 +19,7 @@ public class ConfIng {
     private int online;
     private String member;
     private String creator;
-    private Timestamp createTime;
+    private long createTime;
     private String participator;
 
     public ConfIng(){
@@ -27,7 +27,7 @@ public class ConfIng {
     }
 
     public ConfIng(int id, String title, int type, String password, String channelId, int capacity,
-                   int online, String member, String creator, Timestamp createTime, String participator) {
+                   int online, String member, String creator, long createTime, String participator) {
         this.id = id;
         this.title = title;
         this.type=type;
@@ -94,7 +94,7 @@ public class ConfIng {
         return creator;
     }
 
-    public Timestamp getCreateTime() {
+    public long getCreateTime() {
         return createTime;
     }
 
@@ -118,7 +118,7 @@ public class ConfIng {
         this.creator = creator;
     }
 
-    public void setCreateTime(Timestamp createTime) {
+    public void setCreateTime(long createTime) {
         this.createTime = createTime;
     }
 

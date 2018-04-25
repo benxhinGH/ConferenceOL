@@ -837,9 +837,6 @@ public class PDFView extends RelativeLayout {
         if (moveHandle && scrollHandle != null && !documentFitsView()) {
             scrollHandle.setScroll(positionOffset);
         }
-
-        callbacks.callOnPageScroll(getCurrentPage(), positionOffset);
-
         redraw();
         callbacks.callOnMove(offsetX, offsetY);
     }
@@ -883,6 +880,7 @@ public class PDFView extends RelativeLayout {
      */
     public void zoomTo(float zoom) {
         this.zoom = zoom;
+        callbacks.callOnZoom(zoom);
     }
 
     /**
@@ -983,12 +981,10 @@ public class PDFView extends RelativeLayout {
 
     public void zoomWithAnimation(float centerX, float centerY, float scale) {
         animationManager.startZoomAnimation(centerX, centerY, zoom, scale);
-        callbacks.callOnZoom(centerX, centerY, scale);
     }
 
     public void zoomWithAnimation(float scale) {
         animationManager.startZoomAnimation(getWidth() / 2, getHeight() / 2, zoom, scale);
-        callbacks.callOnZoom(getWidth()/2, getHeight()/2, scale);
     }
 
     private void setScrollHandle(ScrollHandle scrollHandle) {

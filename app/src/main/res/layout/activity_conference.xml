@@ -34,6 +34,7 @@
         android:layout_centerHorizontal="true"
         android:orientation="horizontal"
         android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_conf_control_layout"
         >
         <Button
             android:id="@+id/btnSwitchCamera"

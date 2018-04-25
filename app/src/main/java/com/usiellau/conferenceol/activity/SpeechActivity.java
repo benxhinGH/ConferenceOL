@@ -5,6 +5,7 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +42,8 @@ import java.io.UnsupportedEncodingException;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.agora.rtc.Constants;
+import io.agora.rtc.RtcEngine;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
@@ -54,6 +57,15 @@ public class SpeechActivity extends AppCompatActivity {
 
     @BindView(R.id.pdfview)
     PDFView pdfView;
+    @BindView(R.id.btnLeave)
+    Button btnLeave;
+    @BindView(R.id.btnSendAudio)
+    Button btnSendAudio;
+    @BindView(R.id.btnSpeaker)
+    Button btnSpeaker;
+
+    boolean isSpeaker=true;
+    boolean isAudioSend=true;
 
     Gson gson=new Gson();
 
@@ -72,26 +84,15 @@ public class SpeechActivity extends AppCompatActivity {
             }else if(msg.getProtocolType()==0){
                 DataProtocol data=(DataProtocol)msg;
                 switch (data.getPattion()){
-                    case ScrollEvent.EVENTTYPE:
-                        ScrollEvent scrollEvent=gson.fromJson(data.getData(),ScrollEvent.class);
-                        pdfView.showPage(scrollEvent.getPage());
-                        pdfView.setPositionOffset(scrollEvent.getPositionOffset());
-                        Log.d(TAG,"收到scroll事件:"+scrollEvent.toString());
-                        break;
                     case ZoomEvent.EVENTTYPE:
                         ZoomEvent zoomEvent=gson.fromJson(data.getData(),ZoomEvent.class);
-                        pdfView.zoomWithAnimation(zoomEvent.getCenterX(),zoomEvent.getCenterY(),zoomEvent.getScale());
+                        pdfView.zoomTo(zoomEvent.getZoom());
                         Log.d(TAG,"收到zoom事件:"+zoomEvent.toString());
                         break;
-                    case ScaleEvent.EVENTTYPE:
-                        ScaleEvent scaleEvent=gson.fromJson(data.getData(),ScaleEvent.class);
-                        pdfView.zoomCenteredRelativeTo(scaleEvent.getDzoom(),scaleEvent.getPivot());
-                        Log.d(TAG,"收到scale事件:"+scaleEvent.toString());
-                        break;
                     case MoveEvent.EVENTTYPE:
-                        if(!pdfView.isZooming())return;
                         MoveEvent moveEvent=gson.fromJson(data.getData(),MoveEvent.class);
-                        pdfView.moveTo(moveEvent.getOffsetX(),pdfView.getCurrentYOffset());
+                        pdfView.moveTo(moveEvent.getOffsetX(),moveEvent.getOffsetY());
+                        pdfView.loadPages();
                         Log.d(TAG,"收到move事件:"+moveEvent.toString());
                         break;
                         default:
@@ -115,6 +116,8 @@ public class SpeechActivity extends AppCompatActivity {
 
     ProgressDialog progressDialog;
 
+    RtcEngine mRtcEngine;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,6 +128,28 @@ public class SpeechActivity extends AppCompatActivity {
         roomId=getIntent().getIntExtra("roomId",-1);
 
         requestTcpLongCon();
+
+        if(identity==AuthEvent.TYPE_SPEAKER){
+            joinAudioChannel(Constants.CLIENT_ROLE_BROADCASTER);
+            btnSpeaker.setVisibility(View.GONE);
+        }else if(identity==AuthEvent.TYPE_PARTICIPATOR){
+            joinAudioChannel(Constants.CLIENT_ROLE_AUDIENCE);
+            btnSendAudio.setVisibility(View.GONE);
+        }
+    }
+
+    private void joinAudioChannel(int role){
+        try {
+            mRtcEngine=RtcEngine.create(this,getResources().getString(R.string.agora_sdk_id),null);
+            mRtcEngine.setChannelProfile(Constants.CHANNEL_PROFILE_LIVE_BROADCASTING);
+            mRtcEngine.setClientRole(role);
+            mRtcEngine.joinChannel(null,channelId,null, PreferenceManager.getDefaultSharedPreferences(this).getInt("uid",0));
+            if(role==Constants.CLIENT_ROLE_AUDIENCE){
+                mRtcEngine.setDefaultAudioRoutetoSpeakerphone(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void prepareConfFile(String channelId){
@@ -229,6 +254,7 @@ public class SpeechActivity extends AppCompatActivity {
         dataProtocol.setPattion(0);
         dataProtocol.setData(gson.toJson(authEvent,AuthEvent.class));
         client.addNewRequest(dataProtocol);
+        Log.d(TAG,"进行身份认证，等待数据返回");
     }
 
     private void startSpeech(){
@@ -246,21 +272,10 @@ public class SpeechActivity extends AppCompatActivity {
             //身份为主讲人，为pdfView注册监听器，发送事件
             pdfView.fromFile(theOne)
                     .defaultPage(0)
-                    .onPageScroll(new OnPageScrollListener() {
-                        @Override
-                        public void onPageScrolled(int page, float positionOffset) {
-                            ScrollEvent event=new ScrollEvent(page,positionOffset);
-                            DataProtocol dataProtocol=new DataProtocol();
-                            dataProtocol.setPattion(ScrollEvent.EVENTTYPE);
-                            dataProtocol.setData(gson.toJson(event));
-                            client.addNewRequest(dataProtocol);
-                            Log.d(TAG,"发送scrollEvent："+event.toString());
-                        }
-                    })
                     .onZoom(new OnZoomListener() {
                         @Override
-                        public void onZoom(float centerX, float centerY, float scale) {
-                            ZoomEvent event=new ZoomEvent(centerX, centerY, scale);
+                        public void onZoom(float zoom) {
+                            ZoomEvent event=new ZoomEvent(zoom);
                             DataProtocol dataProtocol=new DataProtocol();
                             dataProtocol.setPattion(ZoomEvent.EVENTTYPE);
                             dataProtocol.setData(gson.toJson(event));
@@ -268,29 +283,17 @@ public class SpeechActivity extends AppCompatActivity {
                             Log.d(TAG,"发送zoomEvent："+event.toString());
                         }
                     })
-                    .onScale(new OnScaleListener() {
+                    .onMove(new OnMoveListener() {
                         @Override
-                        public void onScale(float dzoom, PointF pivot) {
-                            ScaleEvent event=new ScaleEvent(dzoom, pivot);
+                        public void onMove(float offsetX, float offsetY) {
+                            MoveEvent event=new MoveEvent(offsetX, offsetY);
                             DataProtocol dataProtocol=new DataProtocol();
-                            dataProtocol.setPattion(ScaleEvent.EVENTTYPE);
+                            dataProtocol.setPattion(MoveEvent.EVENTTYPE);
                             dataProtocol.setData(gson.toJson(event));
                             client.addNewRequest(dataProtocol);
-                            Log.d(TAG,"发送scaleEvent："+event.toString());
+                            Log.d(TAG,"发送moveEvent："+event.toString());
                         }
                     })
-//                    .onMove(new OnMoveListener() {
-//                        @Override
-//                        public void onMove(float offsetX, float offsetY) {
-//                            if(!pdfView.isZooming())return;
-//                            MoveEvent event=new MoveEvent(offsetX, offsetY);
-//                            DataProtocol dataProtocol=new DataProtocol();
-//                            dataProtocol.setPattion(MoveEvent.EVENTTYPE);
-//                            dataProtocol.setData(gson.toJson(event));
-//                            client.addNewRequest(dataProtocol);
-//                            Log.d(TAG,"发送moveEvent："+event.toString());
-//                        }
-//                    })
                     .spacing(10) // in dp
                     .load();
         }else if(identity==1){
@@ -305,12 +308,65 @@ public class SpeechActivity extends AppCompatActivity {
 
     }
 
+    @OnClick(R.id.btnLeave)
+    void onClickBtnLeave(){
+        finish();
+    }
+
+    @OnClick(R.id.btnSpeaker)
+    void onClickBtnSpeaker(){
+        isSpeaker=!isSpeaker;
+        mRtcEngine.setEnableSpeakerphone(isSpeaker);
+        if(isSpeaker){
+            btnSpeaker.setBackgroundResource(R.drawable.ic_speaker_phone_blue_24dp);
+        }else{
+            btnSpeaker.setBackgroundResource(R.drawable.ic_speaker_phone_white_24dp);
+        }
+    }
+
+    @OnClick(R.id.btnSendAudio)
+    void onClickBtnSendAudio(){
+        mRtcEngine.muteLocalAudioStream(isAudioSend);
+        isAudioSend=!isAudioSend;
+        if(isAudioSend){
+            btnSendAudio.setBackgroundResource(R.drawable.ic_mic_white_24dp);
+        }else{
+            btnSendAudio.setBackgroundResource(R.drawable.ic_mic_off_blue_24dp);
+        }
+    }
+
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        ConfSvMethods.getInstance().leaveRoom(new Observer<HttpResult>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(HttpResult httpResult) {
+                if(httpResult.getCode()==0||httpResult.getCode()==1){
+                    Toast.makeText(SpeechActivity.this, "离开房间成功", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(SpeechActivity.this, "离开房间出错", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(SpeechActivity.this, "error", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        },channelId,PreferenceManager.getDefaultSharedPreferences(this).getString("username",""));
         client.closeConnect();
+        mRtcEngine.leaveChannel();
     }
 
     private void showProgressDialog(){

@@ -6,6 +6,37 @@
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.github.barteksc.pdfviewer.PDFView>
+        android:layout_height="match_parent"/>
+    <LinearLayout
+        android:id="@+id/controlLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_conf_control_layout"
+        >
+        <Button
+            android:id="@+id/btnSendAudio"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:onClick="onSendAudio"
+            android:background="@drawable/ic_mic_white_24dp" />
+        <Button
+            android:id="@+id/btnSpeaker"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:onClick="onSpeaker"
+            android:background="@drawable/ic_speaker_phone_blue_24dp" />
+        <Button
+            android:id="@+id/btnLeave"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:onClick="onLeave"
+            android:background="@drawable/conf_btn_leave_bg"/>
+    </LinearLayout>
+
+
 
 </RelativeLayout>
