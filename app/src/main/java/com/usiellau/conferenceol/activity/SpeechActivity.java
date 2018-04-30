@@ -1,12 +1,9 @@
 package com.usiellau.conferenceol.activity;
 
 import android.app.ProgressDialog;
-import android.graphics.PointF;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,11 +13,10 @@ import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnMoveListener;
-import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
-import com.github.barteksc.pdfviewer.listener.OnScaleListener;
 import com.github.barteksc.pdfviewer.listener.OnZoomListener;
 import com.google.gson.Gson;
 import com.usiellau.conferenceol.R;
+import com.usiellau.conferenceol.foxitpdf.PDFReaderActivity;
 import com.usiellau.conferenceol.network.ConfSvMethods;
 import com.usiellau.conferenceol.network.HttpResult;
 import com.usiellau.conferenceol.network.entity.ConfFile;
@@ -28,8 +24,6 @@ import com.usiellau.conferenceol.tcp.ConnectionClient;
 import com.usiellau.conferenceol.tcp.callback.RequestCallBack;
 import com.usiellau.conferenceol.tcp.event.AuthEvent;
 import com.usiellau.conferenceol.tcp.event.MoveEvent;
-import com.usiellau.conferenceol.tcp.event.ScaleEvent;
-import com.usiellau.conferenceol.tcp.event.ScrollEvent;
 import com.usiellau.conferenceol.tcp.event.ZoomEvent;
 import com.usiellau.conferenceol.tcp.protocol.BasicProtocol;
 import com.usiellau.conferenceol.tcp.protocol.DataAckProtocol;
@@ -37,7 +31,6 @@ import com.usiellau.conferenceol.tcp.protocol.DataProtocol;
 import com.usiellau.conferenceol.util.Utils;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -63,9 +56,13 @@ public class SpeechActivity extends AppCompatActivity {
     Button btnSendAudio;
     @BindView(R.id.btnSpeaker)
     Button btnSpeaker;
+    @BindView(R.id.btnEditFile)
+    Button btnEditFile;
 
     boolean isSpeaker=true;
     boolean isAudioSend=true;
+
+    File fileUsed=null;
 
     Gson gson=new Gson();
 
@@ -132,6 +129,7 @@ public class SpeechActivity extends AppCompatActivity {
         if(identity==AuthEvent.TYPE_SPEAKER){
             joinAudioChannel(Constants.CLIENT_ROLE_BROADCASTER);
             btnSpeaker.setVisibility(View.GONE);
+            btnEditFile.setVisibility(View.GONE);
         }else if(identity==AuthEvent.TYPE_PARTICIPATOR){
             joinAudioChannel(Constants.CLIENT_ROLE_AUDIENCE);
             btnSendAudio.setVisibility(View.GONE);
@@ -267,6 +265,7 @@ public class SpeechActivity extends AppCompatActivity {
                 break;
             }
         }
+        fileUsed=theOne;
 
         if(identity==0){
             //身份为主讲人，为pdfView注册监听器，发送事件
@@ -333,6 +332,13 @@ public class SpeechActivity extends AppCompatActivity {
         }else{
             btnSendAudio.setBackgroundResource(R.drawable.ic_mic_off_blue_24dp);
         }
+    }
+
+    @OnClick(R.id.btnEditFile)
+    void onClickBtnEditFile(){
+        Intent intent=new Intent(this, PDFReaderActivity.class);
+        intent.putExtra("filePath",fileUsed.getPath());
+        startActivity(intent);
     }
 
 
