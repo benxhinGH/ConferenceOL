@@ -5,6 +5,5 @@ package com.github.barteksc.pdfviewer.listener;
  */
 
 public interface OnZoomListener {
-
     void onZoom(float zoom);
 }

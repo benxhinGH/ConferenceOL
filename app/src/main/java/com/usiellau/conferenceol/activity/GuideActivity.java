@@ -44,7 +44,7 @@ public class GuideActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         int[] screenSize= Utils.getAndroiodScreenProperty(this);
         Bitmap bitmap=ImageLoader.decodeSampledBitmapFromResource(getResources(),
-                R.drawable.pic_guide_girl,screenSize[0],screenSize[1]);
+                R.drawable.start_pic,screenSize[0],screenSize[1]);
         imageView.setImageBitmap(bitmap);
         new Handler().postDelayed(new Runnable() {
             @Override

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ConferenceOL</string>
+    <string name="app_name">会议同步系统</string>
     <string name="drawer_open">drawer open</string>
     <string name="drawer_close">drawer close</string>
 

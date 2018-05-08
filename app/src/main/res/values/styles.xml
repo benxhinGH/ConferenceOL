@@ -9,6 +9,7 @@
         <item name="buttonStyle">@style/DefaultButtonStyle</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="colorControlNormal">@color/white</item>
     </style>
 
     <style name="DefaultButtonStyle" parent="Base.Widget.AppCompat.Button">

@@ -123,6 +123,13 @@ public class LoginActivity extends AppCompatActivity{
         etPassword.setText(password);
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        ivBackground.setImageBitmap(ImageLoader.decodeSampledBitmapFromResource(getResources(),
+                R.drawable.login_background,ivBackground.getWidth(),ivBackground.getHeight()));
+    }
+
     @OnClick(R.id.btn_register)
     public void clickBtnRegister(){
         Intent intent=new Intent(this,RegisterActivity.class);
