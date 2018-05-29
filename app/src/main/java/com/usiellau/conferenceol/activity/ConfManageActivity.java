@@ -407,24 +407,21 @@ public class ConfManageActivity extends AppCompatActivity implements NavigationV
         switch (item.getItemId()){
             case R.id.nav_personal:
                 startActivity(UserInfoActivity.class);
-                drawer.closeDrawer(GravityCompat.START);
                 break;
             case R.id.nav_conf_forecast:
-                Toast.makeText(this, "forecast", Toast.LENGTH_SHORT).show();
                 startActivity(ForecastActivity.class);
                 break;
             case R.id.nav_conf_record:
                 startActivity(ConfRecordActivity.class);
-                Toast.makeText(this, "record", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.nav_conf_file:
                 startActivity(FileManageActivity.class);
                 break;
             case R.id.nav_setting:
-                Toast.makeText(this, "setting", Toast.LENGTH_SHORT).show();
+                startActivity(SettingsActivity.class);
                 break;
             case R.id.nav_about:
-                Toast.makeText(this, "about", Toast.LENGTH_SHORT).show();
+                startActivity(AboutActivity.class);
                 break;
             default:
                 break;
