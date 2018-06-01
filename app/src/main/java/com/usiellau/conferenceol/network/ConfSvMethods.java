@@ -41,14 +41,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ConfSvMethods {
 
-    public static final String REMOTE_SERVER_ADDRESS="180.76.106.214:8080";
-    public static final String LOCAL_SERVER_ADDRESS="192.168.1.101:8090";
+    public static final String REMOTE_SERVER_ADDRESS="116.85.38.227:8080";
+    public static final String LOCAL_SERVER_ADDRESS="192.168.1.101:8080";
 
 
     public static final String BASE_URL="http://"+REMOTE_SERVER_ADDRESS+"/ConfOL/";
     private static final int DEFAULT_TIMEOUT=5;
 
-    private Retrofit retrofit;
+    private static Retrofit retrofit;
     private ConfSvApi confSvApi;
     private Gson gson=new Gson();
 
@@ -67,6 +67,7 @@ public class ConfSvMethods {
 
         confSvApi=retrofit.create(ConfSvApi.class);
     }
+
 
     //在访问ConfSvMethods时创建单例
     private static class SingletonHolder{

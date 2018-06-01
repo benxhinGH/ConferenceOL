@@ -11,6 +11,12 @@
         android:background="@color/colorPrimary"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></android.support.v7.widget.Toolbar>
 
+    <Switch
+        android:id="@+id/switch_server"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="切换到本地服务器"/>
 
 
 </LinearLayout>

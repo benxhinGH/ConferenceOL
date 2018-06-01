@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -57,6 +58,10 @@ public class LoginActivity extends AppCompatActivity{
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        //定义全屏参数
+        int flag= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        //设置当前窗体为全屏显示
+        getWindow().setFlags(flag, flag);
         ButterKnife.bind(this);
         autoCompletedIfLastLogined();
     }
@@ -127,7 +132,7 @@ public class LoginActivity extends AppCompatActivity{
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         ivBackground.setImageBitmap(ImageLoader.decodeSampledBitmapFromResource(getResources(),
-                R.drawable.login_background,ivBackground.getWidth(),ivBackground.getHeight()));
+                R.drawable.pic_guide_girl,ivBackground.getWidth(),ivBackground.getHeight()));
     }
 
     @OnClick(R.id.btn_register)

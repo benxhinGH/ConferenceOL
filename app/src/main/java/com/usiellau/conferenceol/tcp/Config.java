@@ -8,6 +8,6 @@ import com.usiellau.conferenceol.network.ConfSvMethods;
 
 public class Config {
     public static final int VERSION = 1;                 //协议版本号
-    public static final String ADDRESS = "180.76.106.214"; //服务器地址
+    public static final String ADDRESS = "116.85.38.227"; //服务器地址
     public static final int PORT = 9013;                 //服务器端口号
 }
